@@ -22,7 +22,7 @@ G1 人形机器人 + DEX1 夹爪，在 OrcaStudio「试管操作」场景里抓�
 │   ├── convert/            HDF5 → LeRobot v2.1、体检、开环验证
 │   └── infer/              闭环推理、HDF5 回放、FK 校验
 ├── configs/                训练启动脚本
-└── checkpoints/            权重（见该目录 README）
+└── checkpoints/            norm_stats.json + 权重说明（权重本体单独分发，见该目录 README）
 ```
 
 ## 环境

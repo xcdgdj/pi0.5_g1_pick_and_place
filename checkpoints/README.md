@@ -1,25 +1,52 @@
-# 权重未包含在本仓库
+# 权重
 
-训练好的 checkpoint 位于训练机（2×4090）：
+## 包含内容
+
+| 文件 | 说明 |
+|---|---|
+| `15000/` | 第 15000 步 checkpoint，5.4GB，54 个文件 |
+| `19999/` | 第 19999 步 checkpoint，5.4GB，54 个文件 |
+| `norm_stats.json` | 训练时使用的归一化统计（从 `lerobot_g1_pick/` 复制） |
+| `MD5SUMS` | 全部文件的校验清单，用于核对 U 盘拷贝完整性 |
+
+每个 checkpoint 目录结构：
 
 ```
-/home/orca/openpi/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora/
-├── 1000/ ... 20000/    每 1000 步一档，共 20 档
+15000/
+├── _CHECKPOINT_METADATA
+├── assets/          空目录（本站训练未写入）
+├── params/          Orbax 参数树，5.1GB，推理必需
+└── train_state/     优化器状态，300MB，仅续训需要
 ```
 
-单档约数 GB，超出 GitHub 单文件限制，不随仓库分发。
+注意：`assets/` 是空的，所以归一化统计不在 checkpoint 里，必须使用本目录附带的 `norm_stats.json`。
 
-## 获取方式
+## 部署位置
 
-1. 从训练机打包（推荐只传 15000 与 19999 两档）：
-   ```bash
-   tar -czf pi05_g1_pick_cube_lora_15000.tar.gz \
-     -C /home/orca/openpi/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora 15000
-   ```
-2. 上传到 HuggingFace Hub 或网盘，在 README 里补充下载链接。
-3. 解压到本地后，`--policy.dir` 指向该目录即可。
+解压后放到 openpi 的标准路径：
 
-## 注意
+```
+$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora/15000
+$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora/19999
+```
 
-- 每个 checkpoint 目录内含 `assets/<asset_id>/norm_stats.json`，**推理必须使用这一份**，不要用新采数据重算。
-- 权重与 norm_stats 绑定：换数据集重训后必须使用新的 checkpoint 与其自带 stats。
+## 完整性校验
+
+```bash
+cd <权重根目录>
+md5sum -c MD5SUMS
+# 应全部输出 OK，共 54 行
+```
+
+## 启动推理服务
+
+```bash
+cd $OPENPI_ROOT
+OPENPI_POLICY_SEED=3 CUDA_VISIBLE_DEVICES=0 \
+XLA_PYTHON_CLIENT_PREALLOCATE=false \
+.venv/bin/python scripts/serve_policy.py policy:checkpoint \
+  --policy.config pi05_g1_pick_cube_lora \
+  --policy.dir $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora/15000
+```
+
+`OPENPI_POLICY_SEED` 决定流匹配采样的噪声起点，同一 seed 下动作可复现；实测 seed 3 在开环 rollout 中完整成功。
