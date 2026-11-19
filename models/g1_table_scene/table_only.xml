@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="table_2m">
+  <!--
+    2.00 m x 2.00 m 桌子，台面顶面 z = 0.75 m，中心在世界原点。
+    仅桌体，不含机械臂与夹爪，便于放置现成的 G1 等模型。
+
+    - 台面拆成「纯视觉 + 碰撞」两份 geom：OrcaStudio 导入器只导出 _col
+      碰撞体且渲染时隐藏，只留碰撞 geom 台面会看不见。
+    - 桌腿为纯视觉；台面下表面 z = 0.71，与腿顶面对齐。
+  -->
+  <compiler angle="radian" meshdir="assets" autolimits="true" />
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
+  </visual>
+  <asset>
+    <material name="wood" rgba="0.55 0.35 0.20 1" specular="0.5" shininess="0.25" />
+    <material name="wood_dark" rgba="0.33 0.20 0.11 1" specular="0.5" shininess="0.25" />
+  </asset>
+  <worldbody>
+    <light name="spotlight" mode="targetbody" target="table" pos="0.5 -1 2" />
+
+    <!-- ===== 桌子：2.00 x 2.00 m，中心在世界原点，台面高度 0.75 m ===== -->
+    <body name="table" pos="0 0 0">
+      <!-- 台面：纯视觉 + 碰撞两份 geom，顶面 z = 0.75，厚 4 cm -->
+      <geom name="table_top" type="box" pos="0 0 0.73" size="1.0 1.0 0.02"
+            material="wood" contype="0" conaffinity="0" group="2" />
+      <geom name="table_top_collision" type="box" pos="0 0 0.73" size="1.0 1.0 0.02"
+            friction="1 0.1 0.001" group="3" />
+      <geom name="table_leg_1" type="box" pos="-0.95 -0.95 0.355" size="0.05 0.05 0.355"
+            material="wood_dark" contype="0" conaffinity="0" group="2" />
+      <geom name="table_leg_2" type="box" pos="-0.95  0.95 0.355" size="0.05 0.05 0.355"
+            material="wood_dark" contype="0" conaffinity="0" group="2" />
+      <geom name="table_leg_3" type="box" pos=" 0.95 -0.95 0.355" size="0.05 0.05 0.355"
+            material="wood_dark" contype="0" conaffinity="0" group="2" />
+      <geom name="table_leg_4" type="box" pos=" 0.95  0.95 0.355" size="0.05 0.05 0.355"
+            material="wood_dark" contype="0" conaffinity="0" group="2" />
+    </body>
+  </worldbody>
+</mujoco>

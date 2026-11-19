@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 红色抓取方块：4cm x 4cm x 4cm，50g，6 自由度 -->
+<mujoco model="red_cube_5cm">
+  <compiler angle="radian" autolimits="true" />
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
+  </visual>
+
+  <worldbody>
+    <!-- 放在地面上：底面贴 z=0 -->
+    <body name="target_cube" pos="0.5 0 0.02">
+      <!-- 6 自由度，可被夹爪抓取 -->
+      <freejoint name="target_cube_free" />
+      <geom name="target_cube_geom"
+            type="box"
+            size="0.02 0.02 0.02"
+            mass="0.05"
+            rgba="1 0 0 1"
+            friction="1.0 0.01 0.001"
+            solimp="0.95 0.99 0.001"
+            solref="0.005 1"
+            condim="4" />
+    </body>
+  </worldbody>
+</mujoco>

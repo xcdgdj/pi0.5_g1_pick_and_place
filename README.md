@@ -9,7 +9,14 @@ G1 人形机器人 + DEX1 夹爪，在 OrcaStudio「试管操作」场景里抓�
 
 ```
 .
-├── models/                 MuJoCo 机器人模型（g1_pick.xml + assets 网格）
+├── models/                 MuJoCo 模型
+│   ├── g1_pick.xml             机器人本体（OrcaStudio 版，DEX1 手指网格不带碰撞）
+│   ├── assets/                 网格与材质
+│   └── g1_table_scene/         纯 MuJoCo 桌面抓取场景素材
+│       ├── table_only.xml          2m×2m 桌子
+│       ├── box_container.xml       20cm 开口收纳盒
+│       ├── red_cube_5cm.xml        4cm 红方块
+│       └── g1_pick/                g1_pick.xml（DEX1 手指带碰撞）+ scene_pick.xml + assets
 ├── dataset/g1_pick_usda/pi/  遥操作采集的原始数据，50 集
 │   └── <episode>/record/proprio_stats.hdf5
 │       <episode>/video/{Camera,wrist_r}.mp4
@@ -43,6 +50,9 @@ G1 人形机器人 + DEX1 夹爪，在 OrcaStudio「试管操作」场景里抓�
 2. 启动场景，选择 `testtube_operation`
 3. 菜单「打开布局」→ 加载本仓库的 `g1_pick_tube.json`（见根目录）
 4. 机器人由 `models/g1_pick.xml` 加载，`--agent_name g1_pick_usda`
+
+> `models/g1_table_scene/` 是不依赖 OrcaStudio 的纯 MuJoCo 桌面场景素材（桌子、盒子、红方块、带碰撞的 G1），
+> 与上面的 OrcaStudio 流程相互独立，可按需单独使用。
 
 ### 2. 采集（可选，数据已附带）
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 顶部开口的方形容器：内部 20cm x 20cm，壁厚 2cm，壁高 2cm，底板厚 0.5cm，固定不动 -->
+<mujoco model="box_container">
+  <compiler angle="radian" autolimits="true" />
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
+  </visual>
+  <worldbody>
+    <!-- 底面贴 z=0，总外形 24cm x 24cm x 2.5cm -->
+    <body name="container" pos="0 0 0">
+      <!-- 底板：0.5cm 厚，外轮廓 24cm x 24cm -->
+      <geom name="container_bottom" type="box"
+            pos="0 0 0.0025" size="0.12 0.12 0.0025"
+            rgba="0.15 0.15 0.15 1" friction="1.0 0.01 0.001" />
+      <!-- 前后两侧壁（沿 y 方向）：长 20cm 填在两个 x 侧壁之间 -->
+      <geom name="container_wall_y_pos" type="box"
+            pos="0 0.11 0.015" size="0.10 0.01 0.01"
+            rgba="0.15 0.15 0.15 1" friction="1.0 0.01 0.001" />
+      <geom name="container_wall_y_neg" type="box"
+            pos="0 -0.11 0.015" size="0.10 0.01 0.01"
+            rgba="0.15 0.15 0.15 1" friction="1.0 0.01 0.001" />
+      <!-- 左右两侧壁（沿 x 方向）：长 24cm，包住四个角 -->
+      <geom name="container_wall_x_pos" type="box"
+            pos="0.11 0 0.015" size="0.01 0.12 0.01"
+            rgba="0.15 0.15 0.15 1" friction="1.0 0.01 0.001" />
+      <geom name="container_wall_x_neg" type="box"
+            pos="-0.11 0 0.015" size="0.01 0.12 0.01"
+            rgba="0.15 0.15 0.15 1" friction="1.0 0.01 0.001" />
+    </body>
+  </worldbody>
+</mujoco>
