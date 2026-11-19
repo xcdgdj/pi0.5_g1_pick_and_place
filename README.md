@@ -22,7 +22,8 @@ G1 人形机器人 + DEX1 夹爪，在 OrcaStudio「试管操作」场景里抓�
 │   ├── convert/            HDF5 → LeRobot v2.1、体检、开环验证
 │   └── infer/              闭环推理、HDF5 回放、FK 校验
 ├── configs/                训练启动脚本
-└── checkpoints/            norm_stats.json + 权重说明（权重本体单独分发，见该目录 README）
+└── checkpoints/            norm_stats.json + 权重说明（权重本体单独分发，解压后放到
+                            $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora/，见 5. 权重部署）
 ```
 
 ## 环境
@@ -72,7 +73,30 @@ cd $OPENPI_ROOT && bash configs/train_g1_pick_cube.sh
 
 配置名 `pi05_g1_pick_cube_lora`，20000 步，LoRA 仅 1.53% 参数可训练。
 
-### 5. 推理
+### 5. 权重部署
+
+权重（`15000/` + `19999/`，各约 5.4GB）体积超过 GitHub 限制，单独用 U 盘分发给合作方。解压后**必须**放到 `$OPENPI_ROOT` 下的这个路径，`--policy.dir` 里写的就是它：
+
+```bash
+$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora/
+├── 15000/          # 推理用，54 个文件，约 5.4GB
+└── 19999/          # 续训/对比用，54 个文件，约 5.4GB
+```
+
+即：
+
+```bash
+mkdir -p $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora
+cp -r 15000 19999 $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora/
+```
+
+三个要点：
+
+- 路径必须带两层同名目录 `pi05_g1_pick_cube_lora/g1_pick_cube_lora/`，少一层 `serve_policy.py` 会找不到 checkpoint。
+- checkpoint 自带 `assets/` 是空的，归一化统计用本仓库的 `checkpoints/norm_stats.json`，拷到训练数据集根目录（`lerobot_g1_pick/norm_stats.json`）即可。
+- 传输后校验：`md5sum -c MD5SUMS`（`MD5SUMS` 与权重同目录分发）。
+
+### 6. 推理
 
 ```bash
 # 训练机
