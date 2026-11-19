@@ -28,6 +28,9 @@ G1 人形机器人 + DEX1 夹爪，在 OrcaStudio「试管操作」场景里抓�
 │   ├── collection/         遥操作采集链路（Pico + OSC + DEX1）
 │   ├── convert/            HDF5 → LeRobot v2.1、体检、开环验证
 │   └── infer/              闭环推理、HDF5 回放、FK 校验
+├── g1_pick_tube.json       OrcaStudio 布局（layout v4.0）
+├── orcastudio_levels/      自建 OrcaStudio level
+│   └── pi/pi.spawnable         level「pi」的场景文件（364KB，采集用的就是它）
 ├── configs/                训练启动脚本
 └── checkpoints/            norm_stats.json + 权重说明（权重本体单独分发，解压后放到
                             $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora/，见 5. 权重部署）
@@ -50,6 +53,9 @@ G1 人形机器人 + DEX1 夹爪，在 OrcaStudio「试管操作」场景里抓�
 2. 启动场景，选择 `testtube_operation`
 3. 菜单「打开布局」→ 加载本仓库的 `g1_pick_tube.json`（见根目录）
 4. 机器人由 `models/g1_pick.xml` 加载，`--agent_name g1_pick_usda`
+
+自建 level `pi` 的场景文件在 `orcastudio_levels/pi/pi.spawnable`，放到 OrcaStudio 的
+`Cache/<平台>/levels/pi/` 下并重启编辑器即可在 level 列表里看到 `pi`（采集脚本里的 `--level pi` 就是它）。
 
 > `models/g1_table_scene/` 是不依赖 OrcaStudio 的纯 MuJoCo 桌面场景素材（桌子、盒子、红方块、带碰撞的 G1），
 > 与上面的 OrcaStudio 流程相互独立，可按需单独使用。
