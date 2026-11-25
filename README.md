@@ -83,7 +83,7 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 │   └── infer/                 闭环推理、HDF5 回放、LeRobot 示范回放、消融
 ├── orcastudio/                OrcaStudio 场景「pi」（自建，整目录交付）
 │   ├── levels/pi/pi.prefab         level 文件，把 `pi` 整个文件夹拖入项目 `levels/` 即可打开
-│   └── assets/importer/            prefab 引用的 47 个资产（42 个 G1 网格 + 5 个盒体 azmodel）
+│   └── assets/importer/            场景全部资产（G1 网格 42 + 桌面/盒子/方块 50，共 92 个文件）
 ├── configs/train_g1_pick_cube.sh       训练启动脚本（v6）
 └── checkpoints/
     ├── norm_stats.json              v6 归一化统计（与数据集内同一份）
@@ -132,14 +132,8 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 
 **第二步：放模型文件（只在新电脑 / 新项目时需要）**
 
-`pi.prefab` 文件本身不包含模型，只记录文件路径。它引用了 47 个模型文件：
-
-- `g1_pick/meshes/` 下 42 个：G1 机器人各个零件的网格
-- `default_box_container_*.usda.azmodel` 5 个：**同一个盒子**的 1 块底 + 4 块侧板
-  （`box_container.usda` 里就是 5 个 `def Mesh`：`container_bottom_col` 和四个
-  `container_wall_{x,y}_{pos,neg}_col`，导入时每块生成一个 azmodel，不是 5 个盒子）
-
-这些路径写死在 prefab 里，所以要按原样复制到项目里（路径不能改、不能摊平）：
+`pi.prefab` 里没有模型，只存了路径和资产 ID。模型全在 `orcastudio/assets/importer/` 下，
+共 92 个文件，**整个目录原样复制**：
 
 ```bash
 # PROJ = 放着 levels/ 和 assets/ 的那一层目录
@@ -147,22 +141,28 @@ PROJ="<OrcaStudio 项目根>"
 cp -r orcastudio/assets/importer/* "$PROJ/assets/importer/"
 ```
 
-复制完目录应该长这样：
+| 内容 | 文件 | 数量 |
+|---|---|---|
+| G1 机器人 | `g1_pick/meshes/*.stl`、`*.obj` | 42 |
+| 桌面 | `table_only.usda` 及其导入产物 `table_only_*` | 17 |
+| 盒子 | `box_container.usda` + `box_container_*` + `default_box_container_*.usda.azmodel` | 21 |
+| 红色方块 | `red_cube_5cm.usda` 及其导入产物 `red_cube_5cm_*` | 12 |
 
-```
-$PROJ/assets/importer/
-├── g1_pick/meshes/*.stl *.obj                42 个
-└── default_box_container_*.usda.azmodel      5 个
-```
+为什么第一眼只看到 G1 和盒子带路径：prefab 里 G1 的网格、盒子的网格写的是文件路径
+（`assets/importer/...`），而桌面和方块的网格组件只存了资产 ID（GUID，没有路径文字），
+所以**不能只挑带路径的文件复制**，必须整目录放。那 3 个 `.usda` 是桌面/盒子/方块的源文件，
+OrcaStudio 启动时自动导入；GUID 由文件路径决定，路径不变就能和 prefab 对上。
 
-确认对不对（两条命令分别输出 `42` 和 `5`）：
+复制完按下面 4 条确认（依次输出 `42`、`17`、`21`、`12`）：
 
 ```bash
 ls "$PROJ/assets/importer/g1_pick/meshes" | wc -l
-ls "$PROJ/assets/importer"/default_box_container_*.usda.azmodel | wc -l
+ls "$PROJ/assets/importer"/table_only* | wc -l
+ls "$PROJ/assets/importer"/box_container* "$PROJ/assets/importer"/default_box_container* | wc -l
+ls "$PROJ/assets/importer"/red_cube_5cm* | wc -l
 ```
 
-少一个文件不会报错，只是对应零件变成白色占位块（机器人缺零件、盒子缺一面），
+少文件不会报错，只是对应零件变成白色占位块（机器人缺零件、盒子缺一面），
 物理和脚本仍然正常。已在本机跑过的不需要重复做，先跑上面的命令确认即可。
 
 **场景内的名字**：实体 `g1_pick_usda`、`box_container_usda`、`table_only_usda`、

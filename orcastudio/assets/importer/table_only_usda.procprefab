@@ -1,0 +1,1828 @@
+{
+    "Source": "Assets/Importer/table_only_usda.procprefab",
+    "ContainerEntity": {
+        "Id": "ContainerEntity",
+        "Name": "table_only_usda",
+        "Components": {
+            "EditorDisabledCompositionComponent": {
+                "$type": "EditorDisabledCompositionComponent",
+                "Id": 9186691557479976223,
+                "DisabledComponents": []
+            },
+            "EditorEntityIconComponent": {
+                "$type": "EditorEntityIconComponent",
+                "Id": 16671470406856203678,
+                "EntityIconAssetId": {
+                    "guid": "{00000000-0000-0000-0000-000000000000}",
+                    "subId": 0
+                }
+            },
+            "EditorEntitySortComponent": {
+                "$type": "EditorEntitySortComponent",
+                "Id": 689050719359368234,
+                "Child Entity Order": [
+                    "Entity_[135651164429]"
+                ]
+            },
+            "EditorInspectorComponent": {
+                "$type": "EditorInspectorComponent",
+                "Id": 4877564559866998591,
+                "ComponentOrderEntryArray": []
+            },
+            "EditorLockComponent": {
+                "$type": "EditorLockComponent",
+                "Id": 17413833672684292483,
+                "Locked": false
+            },
+            "EditorOnlyEntityComponent": {
+                "$type": "EditorOnlyEntityComponent",
+                "Id": 13058230953534254339,
+                "IsEditorOnly": false
+            },
+            "EditorPendingCompositionComponent": {
+                "$type": "EditorPendingCompositionComponent",
+                "Id": 15330400305720631177,
+                "PendingComponents": []
+            },
+            "EditorPrefabComponent": {
+                "$type": "EditorPrefabComponent",
+                "Id": 14641232625509663504
+            },
+            "EditorVisibilityComponent": {
+                "$type": "EditorVisibilityComponent",
+                "Id": 4761751134218403091,
+                "VisibilityFlag": true
+            },
+            "TransformComponent": {
+                "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                "Id": 11629720669401950422,
+                "Parent Entity": "",
+                "Transform Data": {
+                    "Translate": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "Rotate": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "Scale": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "Locked": false,
+                    "UniformScale": 1.0
+                },
+                "Parent Activation Transform Mode": 0,
+                "IsStatic": false,
+                "InterpolatePosition": 0,
+                "InterpolateRotation": 0
+            }
+        },
+        "IsRuntimeActive": true
+    },
+    "Entities": {
+        "Entity_[135651164429]": {
+            "Id": "Entity_[135651164429]",
+            "Name": "mujoco_wrap",
+            "Components": {
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 7819029883315390747,
+                    "DisabledComponents": []
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 3549551879216468536,
+                    "EntityIconAssetId": {
+                        "guid": "{00000000-0000-0000-0000-000000000000}",
+                        "subId": 0
+                    }
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 13477499600359745705,
+                    "Child Entity Order": [
+                        "Entity_[139946131725]"
+                    ]
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 1560468493395556269,
+                    "ComponentOrderEntryArray": []
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 17398456268350491249,
+                    "Locked": false
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 5696521565264920949,
+                    "IsEditorOnly": false
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 4716662319489632339,
+                    "PendingComponents": []
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 5446716452221092358,
+                    "VisibilityFlag": true
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 15185871003465539559,
+                    "Parent Entity": "ContainerEntity",
+                    "Transform Data": {
+                        "Translate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Locked": false,
+                        "UniformScale": 1.0
+                    },
+                    "Parent Activation Transform Mode": 0,
+                    "IsStatic": false,
+                    "InterpolatePosition": 0,
+                    "InterpolateRotation": 0
+                }
+            },
+            "IsRuntimeActive": true
+        },
+        "Entity_[139946131725]": {
+            "Id": "Entity_[139946131725]",
+            "Name": "rootPrim",
+            "Components": {
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 5296828940292494928,
+                    "DisabledComponents": []
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 12844521622332895359,
+                    "EntityIconAssetId": {
+                        "guid": "{00000000-0000-0000-0000-000000000000}",
+                        "subId": 0
+                    }
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 7821886734236622,
+                    "Child Entity Order": [
+                        "Entity_[144241099021]"
+                    ]
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 2335900412194573148,
+                    "ComponentOrderEntryArray": []
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 11186209800562644071,
+                    "Locked": false
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 2488033496967800212,
+                    "IsEditorOnly": false
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 16515244647737555260,
+                    "PendingComponents": []
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 4424687877916955969,
+                    "VisibilityFlag": true
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 1518304872528122091,
+                    "Parent Entity": "Entity_[135651164429]",
+                    "Transform Data": {
+                        "Translate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Locked": false,
+                        "UniformScale": 1.0
+                    },
+                    "Parent Activation Transform Mode": 0,
+                    "IsStatic": true,
+                    "InterpolatePosition": 0,
+                    "InterpolateRotation": 0
+                }
+            },
+            "IsRuntimeActive": true
+        },
+        "Entity_[144241099021]": {
+            "Id": "Entity_[144241099021]",
+            "Name": "table",
+            "Components": {
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 8810628340181083015,
+                    "DisabledComponents": []
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 10881303615866217007,
+                    "EntityIconAssetId": {
+                        "guid": "{00000000-0000-0000-0000-000000000000}",
+                        "subId": 0
+                    }
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 9298080986729703157,
+                    "Child Entity Order": [
+                        "Entity_[148536066317]"
+                    ]
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 524135597554522998,
+                    "ComponentOrderEntryArray": []
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 7004468674101052101,
+                    "Locked": false
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 10797385297315912057,
+                    "IsEditorOnly": false
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 9674988764232677454,
+                    "PendingComponents": []
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 9673021839953473379,
+                    "VisibilityFlag": true
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 11902685271393061087,
+                    "Parent Entity": "Entity_[139946131725]",
+                    "Transform Data": {
+                        "Translate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Locked": false,
+                        "UniformScale": 1.0
+                    },
+                    "Parent Activation Transform Mode": 0,
+                    "IsStatic": true,
+                    "InterpolatePosition": 0,
+                    "InterpolateRotation": 0
+                }
+            },
+            "IsRuntimeActive": true
+        },
+        "Entity_[148536066317]": {
+            "Id": "Entity_[148536066317]",
+            "Name": "table",
+            "Components": {
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 2857269949281227111,
+                    "DisabledComponents": []
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 9607142659432440572,
+                    "EntityIconAssetId": {
+                        "guid": "{00000000-0000-0000-0000-000000000000}",
+                        "subId": 0
+                    }
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 11656946361054081075,
+                    "Child Entity Order": [
+                        "Entity_[174305870093]",
+                        "Entity_[170010902797]",
+                        "Entity_[165715935501]",
+                        "Entity_[161420968205]",
+                        "Entity_[157126000909]",
+                        "Entity_[152831033613]"
+                    ]
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 3387764979856402790,
+                    "ComponentOrderEntryArray": []
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 5656007766747906657,
+                    "Locked": false
+                },
+                "EditorMjBodyComponent": {
+                    "$type": "EditorMjBodyComponent",
+                    "Id": 5768619435912581988,
+                    "Config": {
+                        "body顺序": 0,
+                        "mocap": false
+                    }
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 11738028041913003252,
+                    "IsEditorOnly": false
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 9378865161615137576,
+                    "PendingComponents": []
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 4241918780295710628,
+                    "VisibilityFlag": true
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 11238510289579514641,
+                    "Parent Entity": "Entity_[144241099021]",
+                    "Transform Data": {
+                        "Translate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Locked": false,
+                        "UniformScale": 1.0
+                    },
+                    "Parent Activation Transform Mode": 0,
+                    "IsStatic": true,
+                    "InterpolatePosition": 0,
+                    "InterpolateRotation": 0
+                }
+            },
+            "IsRuntimeActive": true
+        },
+        "Entity_[152831033613]": {
+            "Id": "Entity_[152831033613]",
+            "Name": "table_top_vis",
+            "Components": {
+                "AZ::Render::EditorMeshComponent": {
+                    "$type": "AZ::Render::EditorMeshComponent",
+                    "Id": 15242146293295243520,
+                    "Controller": {
+                        "Configuration": {
+                            "ModelAsset": {
+                                "assetId": {
+                                    "guid": "{ADAE683F-B157-5A27-9F22-9E9498A0868C}",
+                                    "subId": 269735362
+                                },
+                                "loadBehavior": "QueueLoad",
+                                "assetHint": ""
+                            },
+                            "SortKey": 0,
+                            "ExcludeFromReflectionCubeMaps": false,
+                            "UseForwardPassIBLSpecular": false,
+                            "UseMeshlets": false,
+                            "IsRayTracingEnabled": true,
+                            "IsAlwaysDynamic": false,
+                            "SupportRayIntersection": false,
+                            "LodType": 0,
+                            "LodOverride": 0,
+                            "MinimumScreenCoverage": 0.0009259259095415473,
+                            "QualityDecayRate": 0.5,
+                            "LightingChannelConfig": {
+                                "lightingChannelFlags": [
+                                    true,
+                                    true,
+                                    true,
+                                    true,
+                                    true
+                                ]
+                            }
+                        }
+                    },
+                    "meshStats": {}
+                },
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 1865492426572374117,
+                    "DisabledComponents": []
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 14432090360478977074,
+                    "EntityIconAssetId": {
+                        "guid": "{00000000-0000-0000-0000-000000000000}",
+                        "subId": 0
+                    }
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 591552288850821465,
+                    "Child Entity Order": []
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 10439850735002921458,
+                    "ComponentOrderEntryArray": []
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 9803145254043398198,
+                    "Locked": false
+                },
+                "EditorMaterialComponent": {
+                    "$type": "EditorMaterialComponent",
+                    "Id": 4899439673125358063,
+                    "Controller": {
+                        "Configuration": {
+                            "materials": []
+                        }
+                    },
+                    "materialSlotsByLodEnabled": false
+                },
+                "EditorMjGeomComponent": {
+                    "$type": "EditorMjGeomComponent",
+                    "Id": 12856382735457587100,
+                    "Config": {
+                        "physicalMaterial": 0,
+                        "solidity": 1.0,
+                        "roughness": 1.0,
+                        "hardness": 1.0,
+                        "name": "table_top",
+                        "type": 4,
+                        "decompositionThreshold": 0.05000000074505806,
+                        "decompositionMaxConvexHull": -1,
+                        "density": 1000.0,
+                        "condim": 3,
+                        "contype": 0,
+                        "conaffinity": 0,
+                        "pos": [
+                            0.0,
+                            0.0,
+                            0.7300000190734863
+                        ],
+                        "size": [
+                            1.0,
+                            1.0,
+                            0.019999999552965164
+                        ],
+                        "solimp": [
+                            0.8999999761581421,
+                            0.949999988079071,
+                            0.0010000000474974513
+                        ],
+                        "friction": [
+                            1.0,
+                            0.004999999888241291,
+                            0.00009999999747378752
+                        ],
+                        "meshScale": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "fixedMass": false,
+                        "hasFromto": false,
+                        "mass": 1.0,
+                        "from": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "to": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "group": 2,
+                        "quat": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "mesh": "",
+                        "meshFile": "",
+                        "meshAsset": {
+                            "assetId": {
+                                "guid": "{00000000-0000-0000-0000-000000000000}",
+                                "subId": 0
+                            },
+                            "loadBehavior": "QueueLoad",
+                            "assetHint": ""
+                        },
+                        "decompositionAsset": {
+                            "assetId": {
+                                "guid": "{00000000-0000-0000-0000-000000000000}",
+                                "subId": 0
+                            },
+                            "loadBehavior": "QueueLoad",
+                            "assetHint": ""
+                        },
+                        "rgba": [
+                            0.5,
+                            0.5,
+                            0.5,
+                            1.0
+                        ],
+                        "hfield": {
+                            "hfield": "",
+                            "hfieldFile": "",
+                            "hfieldAsset": {
+                                "assetId": {
+                                    "guid": "{00000000-0000-0000-0000-000000000000}",
+                                    "subId": 0
+                                },
+                                "loadBehavior": "QueueLoad",
+                                "assetHint": ""
+                            },
+                            "content_type": "",
+                            "nrow": 0,
+                            "ncol": 0,
+                            "elevation": [],
+                            "size": [
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "priority": 0,
+                        "margin": 0.0,
+                        "solref": [
+                            0.019999999552965164,
+                            1.0
+                        ],
+                        "sdfOctreeMaxDepth": 6
+                    },
+                    "ComponentMode": {}
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 9536665405494403949,
+                    "IsEditorOnly": false
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 12825211801859362570,
+                    "PendingComponents": []
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 1390010186285715229,
+                    "VisibilityFlag": true
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 17135764520474834131,
+                    "Parent Entity": "Entity_[148536066317]",
+                    "Transform Data": {
+                        "Translate": [
+                            0.0,
+                            0.0,
+                            0.7300000190734863
+                        ],
+                        "Rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Locked": false,
+                        "UniformScale": 1.0
+                    },
+                    "Parent Activation Transform Mode": 0,
+                    "IsStatic": true,
+                    "InterpolatePosition": 0,
+                    "InterpolateRotation": 0
+                }
+            },
+            "IsRuntimeActive": true
+        },
+        "Entity_[157126000909]": {
+            "Id": "Entity_[157126000909]",
+            "Name": "table_top_collision_col",
+            "Components": {
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 297098636139330537,
+                    "DisabledComponents": []
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 7870622701638158519,
+                    "EntityIconAssetId": {
+                        "guid": "{00000000-0000-0000-0000-000000000000}",
+                        "subId": 0
+                    }
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 9116744653903137570,
+                    "Child Entity Order": []
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 18237760930540762982,
+                    "ComponentOrderEntryArray": []
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 14646334949439408438,
+                    "Locked": false
+                },
+                "EditorMjGeomComponent": {
+                    "$type": "EditorMjGeomComponent",
+                    "Id": 9528228383484631469,
+                    "Config": {
+                        "physicalMaterial": 0,
+                        "solidity": 1.0,
+                        "roughness": 1.0,
+                        "hardness": 1.0,
+                        "name": "table_top_collision",
+                        "type": 4,
+                        "decompositionThreshold": 0.05000000074505806,
+                        "decompositionMaxConvexHull": -1,
+                        "density": 1000.0,
+                        "condim": 3,
+                        "contype": 1,
+                        "conaffinity": 1,
+                        "pos": [
+                            0.0,
+                            0.0,
+                            0.7300000190734863
+                        ],
+                        "size": [
+                            1.0,
+                            1.0,
+                            0.019999999552965164
+                        ],
+                        "solimp": [
+                            0.8999999761581421,
+                            0.949999988079071,
+                            0.0010000000474974513
+                        ],
+                        "friction": [
+                            1.0,
+                            0.10000000149011612,
+                            0.0010000000474974513
+                        ],
+                        "meshScale": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "fixedMass": false,
+                        "hasFromto": false,
+                        "mass": 1.0,
+                        "from": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "to": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "group": 3,
+                        "quat": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "mesh": "",
+                        "meshFile": "",
+                        "meshAsset": {
+                            "assetId": {
+                                "guid": "{00000000-0000-0000-0000-000000000000}",
+                                "subId": 0
+                            },
+                            "loadBehavior": "QueueLoad",
+                            "assetHint": ""
+                        },
+                        "decompositionAsset": {
+                            "assetId": {
+                                "guid": "{00000000-0000-0000-0000-000000000000}",
+                                "subId": 0
+                            },
+                            "loadBehavior": "QueueLoad",
+                            "assetHint": ""
+                        },
+                        "rgba": [
+                            0.5,
+                            0.5,
+                            0.5,
+                            1.0
+                        ],
+                        "hfield": {
+                            "hfield": "",
+                            "hfieldFile": "",
+                            "hfieldAsset": {
+                                "assetId": {
+                                    "guid": "{00000000-0000-0000-0000-000000000000}",
+                                    "subId": 0
+                                },
+                                "loadBehavior": "QueueLoad",
+                                "assetHint": ""
+                            },
+                            "content_type": "",
+                            "nrow": 0,
+                            "ncol": 0,
+                            "elevation": [],
+                            "size": [
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "priority": 0,
+                        "margin": 0.0,
+                        "solref": [
+                            0.019999999552965164,
+                            1.0
+                        ],
+                        "sdfOctreeMaxDepth": 6
+                    },
+                    "ComponentMode": {}
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 7446729210936701683,
+                    "IsEditorOnly": false
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 8886314381075305887,
+                    "PendingComponents": []
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 10847839092564360924,
+                    "VisibilityFlag": true
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 1551846522793268518,
+                    "Parent Entity": "Entity_[148536066317]",
+                    "Transform Data": {
+                        "Translate": [
+                            0.0,
+                            0.0,
+                            0.7300000190734863
+                        ],
+                        "Rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Locked": false,
+                        "UniformScale": 1.0
+                    },
+                    "Parent Activation Transform Mode": 0,
+                    "IsStatic": true,
+                    "InterpolatePosition": 0,
+                    "InterpolateRotation": 0
+                }
+            },
+            "IsRuntimeActive": true
+        },
+        "Entity_[161420968205]": {
+            "Id": "Entity_[161420968205]",
+            "Name": "table_leg_1_vis",
+            "Components": {
+                "AZ::Render::EditorMeshComponent": {
+                    "$type": "AZ::Render::EditorMeshComponent",
+                    "Id": 8402944952939524574,
+                    "Controller": {
+                        "Configuration": {
+                            "ModelAsset": {
+                                "assetId": {
+                                    "guid": "{ADAE683F-B157-5A27-9F22-9E9498A0868C}",
+                                    "subId": 284166737
+                                },
+                                "loadBehavior": "QueueLoad",
+                                "assetHint": ""
+                            },
+                            "SortKey": 0,
+                            "ExcludeFromReflectionCubeMaps": false,
+                            "UseForwardPassIBLSpecular": false,
+                            "UseMeshlets": false,
+                            "IsRayTracingEnabled": true,
+                            "IsAlwaysDynamic": false,
+                            "SupportRayIntersection": false,
+                            "LodType": 0,
+                            "LodOverride": 0,
+                            "MinimumScreenCoverage": 0.0009259259095415473,
+                            "QualityDecayRate": 0.5,
+                            "LightingChannelConfig": {
+                                "lightingChannelFlags": [
+                                    true,
+                                    true,
+                                    true,
+                                    true,
+                                    true
+                                ]
+                            }
+                        }
+                    },
+                    "meshStats": {}
+                },
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 15673672726795280293,
+                    "DisabledComponents": []
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 838567631482826310,
+                    "EntityIconAssetId": {
+                        "guid": "{00000000-0000-0000-0000-000000000000}",
+                        "subId": 0
+                    }
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 5292085902058535628,
+                    "Child Entity Order": []
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 16672288794404916291,
+                    "ComponentOrderEntryArray": []
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 10001771345874867281,
+                    "Locked": false
+                },
+                "EditorMaterialComponent": {
+                    "$type": "EditorMaterialComponent",
+                    "Id": 13878732426396948890,
+                    "Controller": {
+                        "Configuration": {
+                            "materials": []
+                        }
+                    },
+                    "materialSlotsByLodEnabled": false
+                },
+                "EditorMjGeomComponent": {
+                    "$type": "EditorMjGeomComponent",
+                    "Id": 7330699710756158680,
+                    "Config": {
+                        "physicalMaterial": 0,
+                        "solidity": 1.0,
+                        "roughness": 1.0,
+                        "hardness": 1.0,
+                        "name": "table_leg_1",
+                        "type": 4,
+                        "decompositionThreshold": 0.05000000074505806,
+                        "decompositionMaxConvexHull": -1,
+                        "density": 1000.0,
+                        "condim": 3,
+                        "contype": 0,
+                        "conaffinity": 0,
+                        "pos": [
+                            -0.949999988079071,
+                            -0.949999988079071,
+                            0.35499998927116394
+                        ],
+                        "size": [
+                            0.05000000074505806,
+                            0.05000000074505806,
+                            0.35499998927116394
+                        ],
+                        "solimp": [
+                            0.8999999761581421,
+                            0.949999988079071,
+                            0.0010000000474974513
+                        ],
+                        "friction": [
+                            1.0,
+                            0.004999999888241291,
+                            0.00009999999747378752
+                        ],
+                        "meshScale": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "fixedMass": false,
+                        "hasFromto": false,
+                        "mass": 1.0,
+                        "from": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "to": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "group": 2,
+                        "quat": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "mesh": "",
+                        "meshFile": "",
+                        "meshAsset": {
+                            "assetId": {
+                                "guid": "{00000000-0000-0000-0000-000000000000}",
+                                "subId": 0
+                            },
+                            "loadBehavior": "QueueLoad",
+                            "assetHint": ""
+                        },
+                        "decompositionAsset": {
+                            "assetId": {
+                                "guid": "{00000000-0000-0000-0000-000000000000}",
+                                "subId": 0
+                            },
+                            "loadBehavior": "QueueLoad",
+                            "assetHint": ""
+                        },
+                        "rgba": [
+                            0.5,
+                            0.5,
+                            0.5,
+                            1.0
+                        ],
+                        "hfield": {
+                            "hfield": "",
+                            "hfieldFile": "",
+                            "hfieldAsset": {
+                                "assetId": {
+                                    "guid": "{00000000-0000-0000-0000-000000000000}",
+                                    "subId": 0
+                                },
+                                "loadBehavior": "QueueLoad",
+                                "assetHint": ""
+                            },
+                            "content_type": "",
+                            "nrow": 0,
+                            "ncol": 0,
+                            "elevation": [],
+                            "size": [
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "priority": 0,
+                        "margin": 0.0,
+                        "solref": [
+                            0.019999999552965164,
+                            1.0
+                        ],
+                        "sdfOctreeMaxDepth": 6
+                    },
+                    "ComponentMode": {}
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 4780139614020922454,
+                    "IsEditorOnly": false
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 4047293744941023692,
+                    "PendingComponents": []
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 14014107798514532901,
+                    "VisibilityFlag": true
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 15160997092884344887,
+                    "Parent Entity": "Entity_[148536066317]",
+                    "Transform Data": {
+                        "Translate": [
+                            -0.949999988079071,
+                            -0.949999988079071,
+                            0.35499998927116394
+                        ],
+                        "Rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Locked": false,
+                        "UniformScale": 1.0
+                    },
+                    "Parent Activation Transform Mode": 0,
+                    "IsStatic": true,
+                    "InterpolatePosition": 0,
+                    "InterpolateRotation": 0
+                }
+            },
+            "IsRuntimeActive": true
+        },
+        "Entity_[165715935501]": {
+            "Id": "Entity_[165715935501]",
+            "Name": "table_leg_2_vis",
+            "Components": {
+                "AZ::Render::EditorMeshComponent": {
+                    "$type": "AZ::Render::EditorMeshComponent",
+                    "Id": 1563149543602082979,
+                    "Controller": {
+                        "Configuration": {
+                            "ModelAsset": {
+                                "assetId": {
+                                    "guid": "{ADAE683F-B157-5A27-9F22-9E9498A0868C}",
+                                    "subId": 278103073
+                                },
+                                "loadBehavior": "QueueLoad",
+                                "assetHint": ""
+                            },
+                            "SortKey": 0,
+                            "ExcludeFromReflectionCubeMaps": false,
+                            "UseForwardPassIBLSpecular": false,
+                            "UseMeshlets": false,
+                            "IsRayTracingEnabled": true,
+                            "IsAlwaysDynamic": false,
+                            "SupportRayIntersection": false,
+                            "LodType": 0,
+                            "LodOverride": 0,
+                            "MinimumScreenCoverage": 0.0009259259095415473,
+                            "QualityDecayRate": 0.5,
+                            "LightingChannelConfig": {
+                                "lightingChannelFlags": [
+                                    true,
+                                    true,
+                                    true,
+                                    true,
+                                    true
+                                ]
+                            }
+                        }
+                    },
+                    "meshStats": {}
+                },
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 14495142122679356257,
+                    "DisabledComponents": []
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 1416478310313556847,
+                    "EntityIconAssetId": {
+                        "guid": "{00000000-0000-0000-0000-000000000000}",
+                        "subId": 0
+                    }
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 10713351275836560639,
+                    "Child Entity Order": []
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 7389024823514423060,
+                    "ComponentOrderEntryArray": []
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 9277447389430500381,
+                    "Locked": false
+                },
+                "EditorMaterialComponent": {
+                    "$type": "EditorMaterialComponent",
+                    "Id": 5855517019333006277,
+                    "Controller": {
+                        "Configuration": {
+                            "materials": []
+                        }
+                    },
+                    "materialSlotsByLodEnabled": false
+                },
+                "EditorMjGeomComponent": {
+                    "$type": "EditorMjGeomComponent",
+                    "Id": 10952215623710407004,
+                    "Config": {
+                        "physicalMaterial": 0,
+                        "solidity": 1.0,
+                        "roughness": 1.0,
+                        "hardness": 1.0,
+                        "name": "table_leg_2",
+                        "type": 4,
+                        "decompositionThreshold": 0.05000000074505806,
+                        "decompositionMaxConvexHull": -1,
+                        "density": 1000.0,
+                        "condim": 3,
+                        "contype": 0,
+                        "conaffinity": 0,
+                        "pos": [
+                            -0.949999988079071,
+                            0.949999988079071,
+                            0.35499998927116394
+                        ],
+                        "size": [
+                            0.05000000074505806,
+                            0.05000000074505806,
+                            0.35499998927116394
+                        ],
+                        "solimp": [
+                            0.8999999761581421,
+                            0.949999988079071,
+                            0.0010000000474974513
+                        ],
+                        "friction": [
+                            1.0,
+                            0.004999999888241291,
+                            0.00009999999747378752
+                        ],
+                        "meshScale": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "fixedMass": false,
+                        "hasFromto": false,
+                        "mass": 1.0,
+                        "from": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "to": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "group": 2,
+                        "quat": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "mesh": "",
+                        "meshFile": "",
+                        "meshAsset": {
+                            "assetId": {
+                                "guid": "{00000000-0000-0000-0000-000000000000}",
+                                "subId": 0
+                            },
+                            "loadBehavior": "QueueLoad",
+                            "assetHint": ""
+                        },
+                        "decompositionAsset": {
+                            "assetId": {
+                                "guid": "{00000000-0000-0000-0000-000000000000}",
+                                "subId": 0
+                            },
+                            "loadBehavior": "QueueLoad",
+                            "assetHint": ""
+                        },
+                        "rgba": [
+                            0.5,
+                            0.5,
+                            0.5,
+                            1.0
+                        ],
+                        "hfield": {
+                            "hfield": "",
+                            "hfieldFile": "",
+                            "hfieldAsset": {
+                                "assetId": {
+                                    "guid": "{00000000-0000-0000-0000-000000000000}",
+                                    "subId": 0
+                                },
+                                "loadBehavior": "QueueLoad",
+                                "assetHint": ""
+                            },
+                            "content_type": "",
+                            "nrow": 0,
+                            "ncol": 0,
+                            "elevation": [],
+                            "size": [
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "priority": 0,
+                        "margin": 0.0,
+                        "solref": [
+                            0.019999999552965164,
+                            1.0
+                        ],
+                        "sdfOctreeMaxDepth": 6
+                    },
+                    "ComponentMode": {}
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 12674081997817596286,
+                    "IsEditorOnly": false
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 2151118174159097271,
+                    "PendingComponents": []
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 6844867613064876253,
+                    "VisibilityFlag": true
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 5697315493906977319,
+                    "Parent Entity": "Entity_[148536066317]",
+                    "Transform Data": {
+                        "Translate": [
+                            -0.949999988079071,
+                            0.949999988079071,
+                            0.35499998927116394
+                        ],
+                        "Rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Locked": false,
+                        "UniformScale": 1.0
+                    },
+                    "Parent Activation Transform Mode": 0,
+                    "IsStatic": true,
+                    "InterpolatePosition": 0,
+                    "InterpolateRotation": 0
+                }
+            },
+            "IsRuntimeActive": true
+        },
+        "Entity_[170010902797]": {
+            "Id": "Entity_[170010902797]",
+            "Name": "table_leg_3_vis",
+            "Components": {
+                "AZ::Render::EditorMeshComponent": {
+                    "$type": "AZ::Render::EditorMeshComponent",
+                    "Id": 12677458138043807442,
+                    "Controller": {
+                        "Configuration": {
+                            "ModelAsset": {
+                                "assetId": {
+                                    "guid": "{ADAE683F-B157-5A27-9F22-9E9498A0868C}",
+                                    "subId": 284802185
+                                },
+                                "loadBehavior": "QueueLoad",
+                                "assetHint": ""
+                            },
+                            "SortKey": 0,
+                            "ExcludeFromReflectionCubeMaps": false,
+                            "UseForwardPassIBLSpecular": false,
+                            "UseMeshlets": false,
+                            "IsRayTracingEnabled": true,
+                            "IsAlwaysDynamic": false,
+                            "SupportRayIntersection": false,
+                            "LodType": 0,
+                            "LodOverride": 0,
+                            "MinimumScreenCoverage": 0.0009259259095415473,
+                            "QualityDecayRate": 0.5,
+                            "LightingChannelConfig": {
+                                "lightingChannelFlags": [
+                                    true,
+                                    true,
+                                    true,
+                                    true,
+                                    true
+                                ]
+                            }
+                        }
+                    },
+                    "meshStats": {}
+                },
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 11260785698286890471,
+                    "DisabledComponents": []
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 11239307402212098245,
+                    "EntityIconAssetId": {
+                        "guid": "{00000000-0000-0000-0000-000000000000}",
+                        "subId": 0
+                    }
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 1837203375066163027,
+                    "Child Entity Order": []
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 14871170837960205720,
+                    "ComponentOrderEntryArray": []
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 11533537021202490030,
+                    "Locked": false
+                },
+                "EditorMaterialComponent": {
+                    "$type": "EditorMaterialComponent",
+                    "Id": 718859032615317983,
+                    "Controller": {
+                        "Configuration": {
+                            "materials": []
+                        }
+                    },
+                    "materialSlotsByLodEnabled": false
+                },
+                "EditorMjGeomComponent": {
+                    "$type": "EditorMjGeomComponent",
+                    "Id": 4969806406064018598,
+                    "Config": {
+                        "physicalMaterial": 0,
+                        "solidity": 1.0,
+                        "roughness": 1.0,
+                        "hardness": 1.0,
+                        "name": "table_leg_3",
+                        "type": 4,
+                        "decompositionThreshold": 0.05000000074505806,
+                        "decompositionMaxConvexHull": -1,
+                        "density": 1000.0,
+                        "condim": 3,
+                        "contype": 0,
+                        "conaffinity": 0,
+                        "pos": [
+                            0.949999988079071,
+                            -0.949999988079071,
+                            0.35499998927116394
+                        ],
+                        "size": [
+                            0.05000000074505806,
+                            0.05000000074505806,
+                            0.35499998927116394
+                        ],
+                        "solimp": [
+                            0.8999999761581421,
+                            0.949999988079071,
+                            0.0010000000474974513
+                        ],
+                        "friction": [
+                            1.0,
+                            0.004999999888241291,
+                            0.00009999999747378752
+                        ],
+                        "meshScale": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "fixedMass": false,
+                        "hasFromto": false,
+                        "mass": 1.0,
+                        "from": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "to": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "group": 2,
+                        "quat": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "mesh": "",
+                        "meshFile": "",
+                        "meshAsset": {
+                            "assetId": {
+                                "guid": "{00000000-0000-0000-0000-000000000000}",
+                                "subId": 0
+                            },
+                            "loadBehavior": "QueueLoad",
+                            "assetHint": ""
+                        },
+                        "decompositionAsset": {
+                            "assetId": {
+                                "guid": "{00000000-0000-0000-0000-000000000000}",
+                                "subId": 0
+                            },
+                            "loadBehavior": "QueueLoad",
+                            "assetHint": ""
+                        },
+                        "rgba": [
+                            0.5,
+                            0.5,
+                            0.5,
+                            1.0
+                        ],
+                        "hfield": {
+                            "hfield": "",
+                            "hfieldFile": "",
+                            "hfieldAsset": {
+                                "assetId": {
+                                    "guid": "{00000000-0000-0000-0000-000000000000}",
+                                    "subId": 0
+                                },
+                                "loadBehavior": "QueueLoad",
+                                "assetHint": ""
+                            },
+                            "content_type": "",
+                            "nrow": 0,
+                            "ncol": 0,
+                            "elevation": [],
+                            "size": [
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "priority": 0,
+                        "margin": 0.0,
+                        "solref": [
+                            0.019999999552965164,
+                            1.0
+                        ],
+                        "sdfOctreeMaxDepth": 6
+                    },
+                    "ComponentMode": {}
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 17745445544095300327,
+                    "IsEditorOnly": false
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 12668056945192566627,
+                    "PendingComponents": []
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 7459930315167985309,
+                    "VisibilityFlag": true
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 17171750759130218598,
+                    "Parent Entity": "Entity_[148536066317]",
+                    "Transform Data": {
+                        "Translate": [
+                            0.949999988079071,
+                            -0.949999988079071,
+                            0.35499998927116394
+                        ],
+                        "Rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Locked": false,
+                        "UniformScale": 1.0
+                    },
+                    "Parent Activation Transform Mode": 0,
+                    "IsStatic": true,
+                    "InterpolatePosition": 0,
+                    "InterpolateRotation": 0
+                }
+            },
+            "IsRuntimeActive": true
+        },
+        "Entity_[174305870093]": {
+            "Id": "Entity_[174305870093]",
+            "Name": "table_leg_4_vis",
+            "Components": {
+                "AZ::Render::EditorMeshComponent": {
+                    "$type": "AZ::Render::EditorMeshComponent",
+                    "Id": 16014432552334732926,
+                    "Controller": {
+                        "Configuration": {
+                            "ModelAsset": {
+                                "assetId": {
+                                    "guid": "{ADAE683F-B157-5A27-9F22-9E9498A0868C}",
+                                    "subId": 272705751
+                                },
+                                "loadBehavior": "QueueLoad",
+                                "assetHint": ""
+                            },
+                            "SortKey": 0,
+                            "ExcludeFromReflectionCubeMaps": false,
+                            "UseForwardPassIBLSpecular": false,
+                            "UseMeshlets": false,
+                            "IsRayTracingEnabled": true,
+                            "IsAlwaysDynamic": false,
+                            "SupportRayIntersection": false,
+                            "LodType": 0,
+                            "LodOverride": 0,
+                            "MinimumScreenCoverage": 0.0009259259095415473,
+                            "QualityDecayRate": 0.5,
+                            "LightingChannelConfig": {
+                                "lightingChannelFlags": [
+                                    true,
+                                    true,
+                                    true,
+                                    true,
+                                    true
+                                ]
+                            }
+                        }
+                    },
+                    "meshStats": {}
+                },
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 11655866442060012289,
+                    "DisabledComponents": []
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 8652685863598288906,
+                    "EntityIconAssetId": {
+                        "guid": "{00000000-0000-0000-0000-000000000000}",
+                        "subId": 0
+                    }
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 7289288401092592331,
+                    "Child Entity Order": []
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 17681820543738866199,
+                    "ComponentOrderEntryArray": []
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 11137390868897286617,
+                    "Locked": false
+                },
+                "EditorMaterialComponent": {
+                    "$type": "EditorMaterialComponent",
+                    "Id": 15907871574717616587,
+                    "Controller": {
+                        "Configuration": {
+                            "materials": []
+                        }
+                    },
+                    "materialSlotsByLodEnabled": false
+                },
+                "EditorMjGeomComponent": {
+                    "$type": "EditorMjGeomComponent",
+                    "Id": 13512561562866958187,
+                    "Config": {
+                        "physicalMaterial": 0,
+                        "solidity": 1.0,
+                        "roughness": 1.0,
+                        "hardness": 1.0,
+                        "name": "table_leg_4",
+                        "type": 4,
+                        "decompositionThreshold": 0.05000000074505806,
+                        "decompositionMaxConvexHull": -1,
+                        "density": 1000.0,
+                        "condim": 3,
+                        "contype": 0,
+                        "conaffinity": 0,
+                        "pos": [
+                            0.949999988079071,
+                            0.949999988079071,
+                            0.35499998927116394
+                        ],
+                        "size": [
+                            0.05000000074505806,
+                            0.05000000074505806,
+                            0.35499998927116394
+                        ],
+                        "solimp": [
+                            0.8999999761581421,
+                            0.949999988079071,
+                            0.0010000000474974513
+                        ],
+                        "friction": [
+                            1.0,
+                            0.004999999888241291,
+                            0.00009999999747378752
+                        ],
+                        "meshScale": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "fixedMass": false,
+                        "hasFromto": false,
+                        "mass": 1.0,
+                        "from": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "to": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "group": 2,
+                        "quat": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "mesh": "",
+                        "meshFile": "",
+                        "meshAsset": {
+                            "assetId": {
+                                "guid": "{00000000-0000-0000-0000-000000000000}",
+                                "subId": 0
+                            },
+                            "loadBehavior": "QueueLoad",
+                            "assetHint": ""
+                        },
+                        "decompositionAsset": {
+                            "assetId": {
+                                "guid": "{00000000-0000-0000-0000-000000000000}",
+                                "subId": 0
+                            },
+                            "loadBehavior": "QueueLoad",
+                            "assetHint": ""
+                        },
+                        "rgba": [
+                            0.5,
+                            0.5,
+                            0.5,
+                            1.0
+                        ],
+                        "hfield": {
+                            "hfield": "",
+                            "hfieldFile": "",
+                            "hfieldAsset": {
+                                "assetId": {
+                                    "guid": "{00000000-0000-0000-0000-000000000000}",
+                                    "subId": 0
+                                },
+                                "loadBehavior": "QueueLoad",
+                                "assetHint": ""
+                            },
+                            "content_type": "",
+                            "nrow": 0,
+                            "ncol": 0,
+                            "elevation": [],
+                            "size": [
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "priority": 0,
+                        "margin": 0.0,
+                        "solref": [
+                            0.019999999552965164,
+                            1.0
+                        ],
+                        "sdfOctreeMaxDepth": 6
+                    },
+                    "ComponentMode": {}
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 11300932168257663286,
+                    "IsEditorOnly": false
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 14237159002668632086,
+                    "PendingComponents": []
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 13087634393117813769,
+                    "VisibilityFlag": true
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 14013769826499699285,
+                    "Parent Entity": "Entity_[148536066317]",
+                    "Transform Data": {
+                        "Translate": [
+                            0.949999988079071,
+                            0.949999988079071,
+                            0.35499998927116394
+                        ],
+                        "Rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Locked": false,
+                        "UniformScale": 1.0
+                    },
+                    "Parent Activation Transform Mode": 0,
+                    "IsStatic": true,
+                    "InterpolatePosition": 0,
+                    "InterpolateRotation": 0
+                }
+            },
+            "IsRuntimeActive": true
+        }
+    },
+    "Instances": {}
+}

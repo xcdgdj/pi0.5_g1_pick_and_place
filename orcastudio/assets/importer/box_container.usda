@@ -1,0 +1,317 @@
+#usda 1.0
+(
+    defaultPrim = "rootPrim"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def PhysicsScene "physicsScene"
+{
+    custom float density = 0
+    custom bool generateGlobalConfig = 0
+    custom string integrator = "Euler"
+    vector3f physics:gravityDirection = (0, 0, -1)
+    float physics:gravityMagnitude = 9.81
+    custom float timestep = 0.001
+    custom float viscosity = 0
+}
+
+def Xform "rootPrim"
+{
+    def Xform "worldBody" (
+        prepend apiSchemas = ["PhysicsArticulationRootAPI"]
+    )
+    {
+    }
+
+    def Xform "container"
+    {
+        def Xform "container" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom int keyframeIndex = 0
+            custom bool mocap = 0
+            float physics:density = 1000
+            matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+            def "joints"
+            {
+                def PhysicsFixedJoint "rootJoint_container"
+                {
+                    rel physics:body1 = </rootPrim/container/container/container>
+                }
+            }
+
+            def Mesh "container_bottom_col" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                custom float4 axisangle = (0, 0, 0, 0)
+                custom int conaffinity = 1
+                custom int condim = 3
+                custom int contype = 1
+                custom float density = 1000
+                uniform bool doubleSided = 1
+                float3[] extent = [(-0.24, -0.24, -0.005), (0.24, 0.24, 0.005)]
+                int[] faceVertexCounts = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+                int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+                custom float3 friction = (1, 0.01, 0.001)
+                custom float3 geomSize = (0.12, 0.12, 0.0025)
+                custom int group = 0
+                custom bool hasFromto = 0
+                custom bool hasMass = 0
+                custom float margin = 0
+                custom string material = ""
+                rel material:binding = </rootPrim/container/container/Looks/material_rgba>
+                custom bool mjcfGeom = 1
+                custom string name = "container_bottom"
+                uniform token physics:approximation = "boundingCube"
+                point3f[] points = [(0.12, 0.12, -0.0025), (-0.12, 0.12, -0.0025), (0.12, 0.12, 0.0025), (0.12, 0.12, 0.0025), (-0.12, 0.12, -0.0025), (-0.12, 0.12, 0.0025), (0.12, 0.12, 0.0025), (-0.12, 0.12, 0.0025), (0.12, -0.12, 0.0025), (0.12, -0.12, 0.0025), (-0.12, 0.12, 0.0025), (-0.12, -0.12, 0.0025), (0.12, -0.12, 0.0025), (-0.12, -0.12, 0.0025), (0.12, -0.12, -0.0025), (0.12, -0.12, -0.0025), (-0.12, -0.12, 0.0025), (-0.12, -0.12, -0.0025), (0.12, -0.12, -0.0025), (-0.12, -0.12, -0.0025), (0.12, 0.12, -0.0025), (0.12, 0.12, -0.0025), (-0.12, -0.12, -0.0025), (-0.12, 0.12, -0.0025), (-0.12, 0.12, -0.0025), (-0.12, -0.12, -0.0025), (-0.12, 0.12, 0.0025), (-0.12, 0.12, 0.0025), (-0.12, -0.12, -0.0025), (-0.12, -0.12, 0.0025), (0.12, -0.12, -0.0025), (0.12, 0.12, -0.0025), (0.12, -0.12, 0.0025), (0.12, -0.12, 0.0025), (0.12, 0.12, -0.0025), (0.12, 0.12, 0.0025)]
+                custom float3 pos = (0, 0, 0.0025)
+                texCoord2f[] primvars:st = [(0.375, 0), (0.625, 0), (0.375, 0.25), (0.375, 0.25), (0.625, 0), (0.625, 0.25), (0.375, 0.25), (0.625, 0.25), (0.375, 0.5), (0.375, 0.5), (0.625, 0.25), (0.625, 0.5), (0.375, 0.5), (0.625, 0.5), (0.375, 0.75), (0.375, 0.75), (0.625, 0.5), (0.625, 0.75), (0.375, 0.75), (0.625, 0.75), (0.375, 1), (0.375, 1), (0.625, 0.75), (0.625, 1), (0.625, 0), (0.875, 0), (0.625, 0.25), (0.625, 0.25), (0.875, 0), (0.875, 0.25), (0.125, 0), (0.375, 0), (0.125, 0.25), (0.125, 0.25), (0.375, 0), (0.375, 0.25)] (
+                    interpolation = "faceVarying"
+                )
+                custom int priority = 0
+                uniform token purpose = "guide"
+                custom quatf quat = (1, 0, 0, 0)
+                custom float4 rgba = (0.15, 0.15, 0.15, 1)
+                custom float3 solimp = (0.9, 0.95, 0.001)
+                custom float2 solref = (0.02, 1)
+                custom string type = "box"
+                matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0.0024999999441206455, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+                custom float3 zaxis = (0, 0, 0)
+            }
+
+            def Scope "Looks"
+            {
+                def Material "material_rgba"
+                {
+                    token outputs:surface.connect = </rootPrim/container/container/Looks/material_rgba/PBRShader.outputs:surface>
+
+                    def Shader "PBRShader"
+                    {
+                        uniform token info:id = "UsdPreviewSurface"
+                        color3f inputs:diffuseColor = (0.15, 0.15, 0.15)
+                        token outputs:surface
+                    }
+                }
+
+                def Material "material_rgba_1"
+                {
+                    token outputs:surface.connect = </rootPrim/container/container/Looks/material_rgba_1/PBRShader.outputs:surface>
+
+                    def Shader "PBRShader"
+                    {
+                        uniform token info:id = "UsdPreviewSurface"
+                        color3f inputs:diffuseColor = (0.15, 0.15, 0.15)
+                        token outputs:surface
+                    }
+                }
+
+                def Material "material_rgba_2"
+                {
+                    token outputs:surface.connect = </rootPrim/container/container/Looks/material_rgba_2/PBRShader.outputs:surface>
+
+                    def Shader "PBRShader"
+                    {
+                        uniform token info:id = "UsdPreviewSurface"
+                        color3f inputs:diffuseColor = (0.15, 0.15, 0.15)
+                        token outputs:surface
+                    }
+                }
+
+                def Material "material_rgba_3"
+                {
+                    token outputs:surface.connect = </rootPrim/container/container/Looks/material_rgba_3/PBRShader.outputs:surface>
+
+                    def Shader "PBRShader"
+                    {
+                        uniform token info:id = "UsdPreviewSurface"
+                        color3f inputs:diffuseColor = (0.15, 0.15, 0.15)
+                        token outputs:surface
+                    }
+                }
+
+                def Material "material_rgba_4"
+                {
+                    token outputs:surface.connect = </rootPrim/container/container/Looks/material_rgba_4/PBRShader.outputs:surface>
+
+                    def Shader "PBRShader"
+                    {
+                        uniform token info:id = "UsdPreviewSurface"
+                        color3f inputs:diffuseColor = (0.15, 0.15, 0.15)
+                        token outputs:surface
+                    }
+                }
+            }
+
+            def Mesh "container_wall_y_pos_col" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                custom float4 axisangle = (0, 0, 0, 0)
+                custom int conaffinity = 1
+                custom int condim = 3
+                custom int contype = 1
+                custom float density = 1000
+                uniform bool doubleSided = 1
+                float3[] extent = [(-0.2, -0.02, -0.02), (0.2, 0.02, 0.02)]
+                int[] faceVertexCounts = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+                int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+                custom float3 friction = (1, 0.01, 0.001)
+                custom float3 geomSize = (0.1, 0.01, 0.01)
+                custom int group = 0
+                custom bool hasFromto = 0
+                custom bool hasMass = 0
+                custom float margin = 0
+                custom string material = ""
+                rel material:binding = </rootPrim/container/container/Looks/material_rgba_1>
+                custom bool mjcfGeom = 1
+                custom string name = "container_wall_y_pos"
+                uniform token physics:approximation = "boundingCube"
+                point3f[] points = [(0.1, 0.01, -0.01), (-0.1, 0.01, -0.01), (0.1, 0.01, 0.01), (0.1, 0.01, 0.01), (-0.1, 0.01, -0.01), (-0.1, 0.01, 0.01), (0.1, 0.01, 0.01), (-0.1, 0.01, 0.01), (0.1, -0.01, 0.01), (0.1, -0.01, 0.01), (-0.1, 0.01, 0.01), (-0.1, -0.01, 0.01), (0.1, -0.01, 0.01), (-0.1, -0.01, 0.01), (0.1, -0.01, -0.01), (0.1, -0.01, -0.01), (-0.1, -0.01, 0.01), (-0.1, -0.01, -0.01), (0.1, -0.01, -0.01), (-0.1, -0.01, -0.01), (0.1, 0.01, -0.01), (0.1, 0.01, -0.01), (-0.1, -0.01, -0.01), (-0.1, 0.01, -0.01), (-0.1, 0.01, -0.01), (-0.1, -0.01, -0.01), (-0.1, 0.01, 0.01), (-0.1, 0.01, 0.01), (-0.1, -0.01, -0.01), (-0.1, -0.01, 0.01), (0.1, -0.01, -0.01), (0.1, 0.01, -0.01), (0.1, -0.01, 0.01), (0.1, -0.01, 0.01), (0.1, 0.01, -0.01), (0.1, 0.01, 0.01)]
+                custom float3 pos = (0, 0.11, 0.015)
+                texCoord2f[] primvars:st = [(0.375, 0), (0.625, 0), (0.375, 0.25), (0.375, 0.25), (0.625, 0), (0.625, 0.25), (0.375, 0.25), (0.625, 0.25), (0.375, 0.5), (0.375, 0.5), (0.625, 0.25), (0.625, 0.5), (0.375, 0.5), (0.625, 0.5), (0.375, 0.75), (0.375, 0.75), (0.625, 0.5), (0.625, 0.75), (0.375, 0.75), (0.625, 0.75), (0.375, 1), (0.375, 1), (0.625, 0.75), (0.625, 1), (0.625, 0), (0.875, 0), (0.625, 0.25), (0.625, 0.25), (0.875, 0), (0.875, 0.25), (0.125, 0), (0.375, 0), (0.125, 0.25), (0.125, 0.25), (0.375, 0), (0.375, 0.25)] (
+                    interpolation = "faceVarying"
+                )
+                custom int priority = 0
+                uniform token purpose = "guide"
+                custom quatf quat = (1, 0, 0, 0)
+                custom float4 rgba = (0.15, 0.15, 0.15, 1)
+                custom float3 solimp = (0.9, 0.95, 0.001)
+                custom float2 solref = (0.02, 1)
+                custom string type = "box"
+                matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0.10999999940395355, 0.014999999664723873, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+                custom float3 zaxis = (0, 0, 0)
+            }
+
+            def Mesh "container_wall_y_neg_col" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                custom float4 axisangle = (0, 0, 0, 0)
+                custom int conaffinity = 1
+                custom int condim = 3
+                custom int contype = 1
+                custom float density = 1000
+                uniform bool doubleSided = 1
+                float3[] extent = [(-0.2, -0.02, -0.02), (0.2, 0.02, 0.02)]
+                int[] faceVertexCounts = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+                int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+                custom float3 friction = (1, 0.01, 0.001)
+                custom float3 geomSize = (0.1, 0.01, 0.01)
+                custom int group = 0
+                custom bool hasFromto = 0
+                custom bool hasMass = 0
+                custom float margin = 0
+                custom string material = ""
+                rel material:binding = </rootPrim/container/container/Looks/material_rgba_2>
+                custom bool mjcfGeom = 1
+                custom string name = "container_wall_y_neg"
+                uniform token physics:approximation = "boundingCube"
+                point3f[] points = [(0.1, 0.01, -0.01), (-0.1, 0.01, -0.01), (0.1, 0.01, 0.01), (0.1, 0.01, 0.01), (-0.1, 0.01, -0.01), (-0.1, 0.01, 0.01), (0.1, 0.01, 0.01), (-0.1, 0.01, 0.01), (0.1, -0.01, 0.01), (0.1, -0.01, 0.01), (-0.1, 0.01, 0.01), (-0.1, -0.01, 0.01), (0.1, -0.01, 0.01), (-0.1, -0.01, 0.01), (0.1, -0.01, -0.01), (0.1, -0.01, -0.01), (-0.1, -0.01, 0.01), (-0.1, -0.01, -0.01), (0.1, -0.01, -0.01), (-0.1, -0.01, -0.01), (0.1, 0.01, -0.01), (0.1, 0.01, -0.01), (-0.1, -0.01, -0.01), (-0.1, 0.01, -0.01), (-0.1, 0.01, -0.01), (-0.1, -0.01, -0.01), (-0.1, 0.01, 0.01), (-0.1, 0.01, 0.01), (-0.1, -0.01, -0.01), (-0.1, -0.01, 0.01), (0.1, -0.01, -0.01), (0.1, 0.01, -0.01), (0.1, -0.01, 0.01), (0.1, -0.01, 0.01), (0.1, 0.01, -0.01), (0.1, 0.01, 0.01)]
+                custom float3 pos = (0, -0.11, 0.015)
+                texCoord2f[] primvars:st = [(0.375, 0), (0.625, 0), (0.375, 0.25), (0.375, 0.25), (0.625, 0), (0.625, 0.25), (0.375, 0.25), (0.625, 0.25), (0.375, 0.5), (0.375, 0.5), (0.625, 0.25), (0.625, 0.5), (0.375, 0.5), (0.625, 0.5), (0.375, 0.75), (0.375, 0.75), (0.625, 0.5), (0.625, 0.75), (0.375, 0.75), (0.625, 0.75), (0.375, 1), (0.375, 1), (0.625, 0.75), (0.625, 1), (0.625, 0), (0.875, 0), (0.625, 0.25), (0.625, 0.25), (0.875, 0), (0.875, 0.25), (0.125, 0), (0.375, 0), (0.125, 0.25), (0.125, 0.25), (0.375, 0), (0.375, 0.25)] (
+                    interpolation = "faceVarying"
+                )
+                custom int priority = 0
+                uniform token purpose = "guide"
+                custom quatf quat = (1, 0, 0, 0)
+                custom float4 rgba = (0.15, 0.15, 0.15, 1)
+                custom float3 solimp = (0.9, 0.95, 0.001)
+                custom float2 solref = (0.02, 1)
+                custom string type = "box"
+                matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, -0.10999999940395355, 0.014999999664723873, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+                custom float3 zaxis = (0, 0, 0)
+            }
+
+            def Mesh "container_wall_x_pos_col" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                custom float4 axisangle = (0, 0, 0, 0)
+                custom int conaffinity = 1
+                custom int condim = 3
+                custom int contype = 1
+                custom float density = 1000
+                uniform bool doubleSided = 1
+                float3[] extent = [(-0.02, -0.24, -0.02), (0.02, 0.24, 0.02)]
+                int[] faceVertexCounts = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+                int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+                custom float3 friction = (1, 0.01, 0.001)
+                custom float3 geomSize = (0.01, 0.12, 0.01)
+                custom int group = 0
+                custom bool hasFromto = 0
+                custom bool hasMass = 0
+                custom float margin = 0
+                custom string material = ""
+                rel material:binding = </rootPrim/container/container/Looks/material_rgba_3>
+                custom bool mjcfGeom = 1
+                custom string name = "container_wall_x_pos"
+                uniform token physics:approximation = "boundingCube"
+                point3f[] points = [(0.01, 0.12, -0.01), (-0.01, 0.12, -0.01), (0.01, 0.12, 0.01), (0.01, 0.12, 0.01), (-0.01, 0.12, -0.01), (-0.01, 0.12, 0.01), (0.01, 0.12, 0.01), (-0.01, 0.12, 0.01), (0.01, -0.12, 0.01), (0.01, -0.12, 0.01), (-0.01, 0.12, 0.01), (-0.01, -0.12, 0.01), (0.01, -0.12, 0.01), (-0.01, -0.12, 0.01), (0.01, -0.12, -0.01), (0.01, -0.12, -0.01), (-0.01, -0.12, 0.01), (-0.01, -0.12, -0.01), (0.01, -0.12, -0.01), (-0.01, -0.12, -0.01), (0.01, 0.12, -0.01), (0.01, 0.12, -0.01), (-0.01, -0.12, -0.01), (-0.01, 0.12, -0.01), (-0.01, 0.12, -0.01), (-0.01, -0.12, -0.01), (-0.01, 0.12, 0.01), (-0.01, 0.12, 0.01), (-0.01, -0.12, -0.01), (-0.01, -0.12, 0.01), (0.01, -0.12, -0.01), (0.01, 0.12, -0.01), (0.01, -0.12, 0.01), (0.01, -0.12, 0.01), (0.01, 0.12, -0.01), (0.01, 0.12, 0.01)]
+                custom float3 pos = (0.11, 0, 0.015)
+                texCoord2f[] primvars:st = [(0.375, 0), (0.625, 0), (0.375, 0.25), (0.375, 0.25), (0.625, 0), (0.625, 0.25), (0.375, 0.25), (0.625, 0.25), (0.375, 0.5), (0.375, 0.5), (0.625, 0.25), (0.625, 0.5), (0.375, 0.5), (0.625, 0.5), (0.375, 0.75), (0.375, 0.75), (0.625, 0.5), (0.625, 0.75), (0.375, 0.75), (0.625, 0.75), (0.375, 1), (0.375, 1), (0.625, 0.75), (0.625, 1), (0.625, 0), (0.875, 0), (0.625, 0.25), (0.625, 0.25), (0.875, 0), (0.875, 0.25), (0.125, 0), (0.375, 0), (0.125, 0.25), (0.125, 0.25), (0.375, 0), (0.375, 0.25)] (
+                    interpolation = "faceVarying"
+                )
+                custom int priority = 0
+                uniform token purpose = "guide"
+                custom quatf quat = (1, 0, 0, 0)
+                custom float4 rgba = (0.15, 0.15, 0.15, 1)
+                custom float3 solimp = (0.9, 0.95, 0.001)
+                custom float2 solref = (0.02, 1)
+                custom string type = "box"
+                matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0.10999999940395355, 0, 0.014999999664723873, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+                custom float3 zaxis = (0, 0, 0)
+            }
+
+            def Mesh "container_wall_x_neg_col" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                custom float4 axisangle = (0, 0, 0, 0)
+                custom int conaffinity = 1
+                custom int condim = 3
+                custom int contype = 1
+                custom float density = 1000
+                uniform bool doubleSided = 1
+                float3[] extent = [(-0.02, -0.24, -0.02), (0.02, 0.24, 0.02)]
+                int[] faceVertexCounts = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+                int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+                custom float3 friction = (1, 0.01, 0.001)
+                custom float3 geomSize = (0.01, 0.12, 0.01)
+                custom int group = 0
+                custom bool hasFromto = 0
+                custom bool hasMass = 0
+                custom float margin = 0
+                custom string material = ""
+                rel material:binding = </rootPrim/container/container/Looks/material_rgba_4>
+                custom bool mjcfGeom = 1
+                custom string name = "container_wall_x_neg"
+                uniform token physics:approximation = "boundingCube"
+                point3f[] points = [(0.01, 0.12, -0.01), (-0.01, 0.12, -0.01), (0.01, 0.12, 0.01), (0.01, 0.12, 0.01), (-0.01, 0.12, -0.01), (-0.01, 0.12, 0.01), (0.01, 0.12, 0.01), (-0.01, 0.12, 0.01), (0.01, -0.12, 0.01), (0.01, -0.12, 0.01), (-0.01, 0.12, 0.01), (-0.01, -0.12, 0.01), (0.01, -0.12, 0.01), (-0.01, -0.12, 0.01), (0.01, -0.12, -0.01), (0.01, -0.12, -0.01), (-0.01, -0.12, 0.01), (-0.01, -0.12, -0.01), (0.01, -0.12, -0.01), (-0.01, -0.12, -0.01), (0.01, 0.12, -0.01), (0.01, 0.12, -0.01), (-0.01, -0.12, -0.01), (-0.01, 0.12, -0.01), (-0.01, 0.12, -0.01), (-0.01, -0.12, -0.01), (-0.01, 0.12, 0.01), (-0.01, 0.12, 0.01), (-0.01, -0.12, -0.01), (-0.01, -0.12, 0.01), (0.01, -0.12, -0.01), (0.01, 0.12, -0.01), (0.01, -0.12, 0.01), (0.01, -0.12, 0.01), (0.01, 0.12, -0.01), (0.01, 0.12, 0.01)]
+                custom float3 pos = (-0.11, 0, 0.015)
+                texCoord2f[] primvars:st = [(0.375, 0), (0.625, 0), (0.375, 0.25), (0.375, 0.25), (0.625, 0), (0.625, 0.25), (0.375, 0.25), (0.625, 0.25), (0.375, 0.5), (0.375, 0.5), (0.625, 0.25), (0.625, 0.5), (0.375, 0.5), (0.625, 0.5), (0.375, 0.75), (0.375, 0.75), (0.625, 0.5), (0.625, 0.75), (0.375, 0.75), (0.625, 0.75), (0.375, 1), (0.375, 1), (0.625, 0.75), (0.625, 1), (0.625, 0), (0.875, 0), (0.625, 0.25), (0.625, 0.25), (0.875, 0), (0.875, 0.25), (0.125, 0), (0.375, 0), (0.125, 0.25), (0.125, 0.25), (0.375, 0), (0.375, 0.25)] (
+                    interpolation = "faceVarying"
+                )
+                custom int priority = 0
+                uniform token purpose = "guide"
+                custom quatf quat = (1, 0, 0, 0)
+                custom float4 rgba = (0.15, 0.15, 0.15, 1)
+                custom float3 solimp = (0.9, 0.95, 0.001)
+                custom float2 solref = (0.02, 1)
+                custom string type = "box"
+                matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (-0.10999999940395355, 0, 0.014999999664723873, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+                custom float3 zaxis = (0, 0, 0)
+            }
+        }
+    }
+}
+
