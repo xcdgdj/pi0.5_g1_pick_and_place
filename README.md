@@ -205,6 +205,14 @@ uv run scripts/compute_norm_stats.py --config-name pi05_g1_pick_cube_lora_v6
 
 ### 4.3 训练
 
+> **起点约定**：下面 4.3 写的是 v6 当初**怎么来的**（从 v2/1999 起训 2000 步），仅用于复现 v6。
+> 后续任何继续训练一律以 **v6/1999** 为起点，不再从 v2 起训：
+>
+> - 新数据再微调：新建 config（如 `pi05_g1_pick_cube_lora_v7`），`weight_loader` 指向
+>   `checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999/params`，学习率降到 peak 1e-5
+> - 同数据继续练更多步：同一 config 加 `--resume`，`checkpoint_dir` 指向 v6 输出目录，
+>   会从 `train_state/` 恢复 optimizer / 步数 / EMA（先把 v6 的 `1999/` 备份一份）
+
 ```bash
 # 1) 把改动打到 openpi
 cp -r openpi_changes/* $OPENPI_ROOT/
