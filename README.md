@@ -8,6 +8,33 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 
 ---
 
+## 0. 开始前：设置 4 个路径变量
+
+下面所有命令都直接使用这 4 个变量。**每开一个新终端都要先执行一次**（或把它们写进 `~/.bashrc`）：
+
+```bash
+export REPO=$HOME/pi05-release
+export OPENPI_ROOT=$HOME/openpi
+export ORCA_REPO=$HOME/OrcaManipulation
+export PROJ=$HOME/orca_studio/OrcaSim/OrcaSim
+```
+
+| 变量 | 指向 | 怎么确定 |
+|---|---|---|
+| `REPO` | 本仓库解压/克隆后的根目录 | 里面有 `README.md`、`dataset/`、`models/` |
+| `OPENPI_ROOT` | 官方 openpi 仓库根目录 | 里面有 `pyproject.toml`、`scripts/train.py` |
+| `ORCA_REPO` | OrcaManipulation 仓库根目录 | 里面有 `src/examples/dataCollection/` |
+| `PROJ` | OrcaStudio 项目根目录 | 里面有 `Levels/` 和 `Assets/`（Linux 区分大小写，以你项目里实际名字为准） |
+
+```bash
+# 检查 4 个变量是否都对（4 行都要存在）
+ls -d $REPO $OPENPI_ROOT $ORCA_REPO $PROJ
+```
+
+如果某行报 `No such file or directory`，就把上面 `export` 里对应的路径改成你机器上的真实路径，再往下做。
+
+---
+
 ## 1. 结果摘要（v6，闭环 rollout）
 
 **评估协议**：v6 checkpoint 1999、每次从干净场景 reset、600 步上限、30 Hz、
@@ -82,7 +109,7 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 │   ├── convert/               HDF5 → LeRobot v2.1、合并、体检、开环验证
 │   └── infer/                 闭环推理、HDF5 回放、LeRobot 示范回放、消融
 ├── orcastudio/                OrcaStudio 场景「pi」（自建，整目录交付）
-│   ├── levels/pi/pi.prefab         level 文件，把 `pi` 整个文件夹拖入项目 `levels/` 即可打开
+│   ├── levels/pi/pi.prefab         level 文件
 │   └── assets/importer/            模型源文件 45 个（g1_pick/meshes 42 + 3 个场景 usda）
 ├── configs/train_g1_pick_cube.sh       训练启动脚本（v6）
 └── checkpoints/
@@ -92,36 +119,123 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 
 ---
 
-## 3. 环境
+## 3. 环境安装（从头照抄）
 
-| 组件 | 版本/说明 |
+### 3.1 需要什么
+
+| 组件 | 版本 / 说明 |
 |---|---|
-| OrcaStudio / OrcaLab | 任意版本即可，**无需订阅任何资产包**（场景由本仓库自带文件搭建） |
-| OrcaGym | conda 环境 `orcalab_26.9.1` |
-| openpi | 官方 Physical-Intelligence/openpi，基线 commit `981483d`（2025-12-27）；打上 `openpi_changes/` 里的 8 个文件 |
-| 训练硬件 | 2× RTX 4090 24GB（无 NVLink） |
-| 推理 | 单卡即可（策略服务约 8.5 GB 显存） |
+| 操作系统 | Linux（命令按 bash 写） |
+| OrcaStudio / OrcaLab | 任意近期版本，**无需订阅任何资产包**（场景由本仓库自带文件搭建） |
+| Python（采集/推理） | conda 环境 `orcalab_26.9.1`，Python 3.12 + orca-gym 26.9.1 |
+| openpi（训练/策略服务） | 官方 Physical-Intelligence/openpi，commit `981483d`，用 `uv` 管理 |
+| 训练硬件 | 2× RTX 4090 24GB（无 NVLink）；单卡也能跑，只是慢 |
+| 推理硬件 | 单卡即可（策略服务约 8.5 GB 显存） |
+
+### 3.2 下载三个仓库
+
+```bash
+cd $HOME
+git clone https://github.com/xcdgdj/pi0.5_g1_pick_and_place.git pi05-release
+git clone -b g1_pick_tube https://github.com/openverse-orca/OrcaManipulation.git
+git clone https://github.com/Physical-Intelligence/openpi.git
+cd openpi && git checkout 981483d
+```
+
+正常结果（最后一条应输出 `981483d`）：
+
+```bash
+git -C $HOME/openpi rev-parse --short HEAD
+```
+
+> 如果你把仓库放在了别的路径，回到第 0 节把 4 个变量改成新路径。
+
+### 3.3 安装 openpi
+
+先装 `uv`（已装过会提示已存在，可跳过）：
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+再装依赖（第一次会下载较多包）：
+
+```bash
+cd $OPENPI_ROOT
+GIT_LFS_SKIP_SMUDGE=1 uv sync
+GIT_LFS_SKIP_SMUDGE=1 uv pip install -e .
+```
+
+正常结果：`uv sync` 最后输出 `Installed ... packages`，没有红色报错。
+
+把本仓库的 openpi 改动打进去：
+
+```bash
+cp -r $REPO/openpi_changes/* $OPENPI_ROOT/
+cp $REPO/configs/train_g1_pick_cube.sh $OPENPI_ROOT/
+```
+
+正常结果（能打印 `openpi ok`）：
+
+```bash
+cd $OPENPI_ROOT
+uv run python -c "from openpi.training import config; print('openpi ok')"
+```
+
+### 3.4 安装采集/推理用的 conda 环境
+
+```bash
+conda create -n orcalab_26.9.1 python=3.12 -y
+conda activate orcalab_26.9.1
+pip install "orca-gym==26.9.1" h5py pyyaml opencv-python pyarrow pandas
+pip install -e $OPENPI_ROOT/packages/openpi-client
+```
+
+正常结果（应输出 `26.9.1`）：
+
+```bash
+python -c "import orca_gym, cv2, pyarrow, pandas, openpi_client; print(orca_gym.__version__)"
+```
+
+> 以后每次跑**采集或推理**，都要先 `conda activate orcalab_26.9.1`。
+> **训练和策略服务**不用 conda，它们走 openpi 自己的 `uv` 环境。
+
+### 3.5 把本项目的脚本放进 OrcaManipulation
+
+```bash
+cp $REPO/scripts/collection/g1_dex1_collection_tele.py $ORCA_REPO/src/examples/dataCollection/
+cp $REPO/scripts/collection/dagger_release_collect.py     $ORCA_REPO/src/examples/dataCollection/
+cp $REPO/scripts/infer/*.py                               $ORCA_REPO/src/examples/dataCollection/
+cp $REPO/scripts/collection/g1_dex1_data_storage.py       $ORCA_REPO/src/dataStorage/
+```
+
+正常结果（第一条打印出脚本路径；第二条输出 `SAME`）：
+
+```bash
+ls $ORCA_REPO/src/examples/dataCollection/infer_g1_pick.py
+diff $ORCA_REPO/src/dataStorage/g1_dex1_data_storage.py $REPO/scripts/collection/g1_dex1_data_storage.py && echo SAME
+```
+
+为什么要拷这些文件：
+
+- `infer_g1_pick.py`、`dagger_release_collect.py`、`replay_*.py` 在上游仓库里没有，必须从本仓库拷。
+- `g1_dex1_data_storage.py` 相对上游多了一处：每集 HDF5 写入固定语言指令
+  `Pick up the red cube and place it in the box.`。不覆盖的话，采集出的 Episode 没有
+  `task_description`，转换后 LeRobot 的 task 字段为空，训练的 prompt 就错了。
 
 ---
 
 ## 4. 复现顺序
 
-> **代码放在哪、在哪运行**
->
-> - `scripts/collection/` 与 `scripts/infer/` 是从 OrcaManipulation 仓库
->   （`OrcaManipulation_g1_pick_tube`）的 `src/examples/dataCollection/` 镜像出来的，
->   必须**拷回该位置**，并且所有采集/推理命令都**在该仓库根目录下执行**：
->   `python src/examples/dataCollection/<脚本名>.py ...`
->   （脚本里的 `ENTRY_POINT = envs.dataCollection.dataCollection_env` 要求仓库 `src/` 在
->   `sys.path` 上，在别处直接跑 `scripts/...` 会 import 失败）
-> - `scripts/convert/`、`configs/` 是独立脚本，放任意目录执行
-> - 采集与推理都在 conda 环境 `orcalab_26.9.1` 下执行，通过 gRPC 连接 `localhost:50051`
->   的 OrcaGym 服务（先在 OrcaStudio 里启动 level `pi`）
-> - OrcaManipulation 仓库**不随本仓库分发**，需自备：
->   `git clone -b g1_pick_tube https://github.com/openverse-orca/OrcaManipulation.git`
->   采集/推理依赖它的 `src/envs/dataCollection/data_collection_env.py`（`ENTRY_POINT` 指向这里）。
->   注意：`infer_g1_pick.py`、`dagger_release_collect.py`、`replay_lerobot_demo.py` 等
->   脚本上游仓库里没有，必须从本仓库 `scripts/` 拷入
+### 4.0 只想复现成功率（最短路径）
+
+按顺序做这 5 步，不用采集、不用训练：
+
+1. 装环境：第 3.2 ~ 3.5 节
+2. 放场景并打开 level `pi`：4.1 节
+3. 下载 v6 权重并解压：4.4 节第一段
+4. 启动策略服务：4.5 节「终端 A」
+5. 跑闭环推理：4.5 节「终端 B」
 
 ### 4.1 导入场景（自建 level「pi」）
 
@@ -134,90 +248,101 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 | `box_container_usda` | `models/g1_table_scene/box_container.xml` | 目标盒子 |
 | `red_cube_5cm_usda` | `models/g1_table_scene/red_cube_5cm.xml` | 5 cm 红色方块 |
 
-打开方式（两步）：
-
-**第一步：放场景文件**
-
-把 `orcastudio/levels/pi` 这个文件夹整个拖进 OrcaStudio 项目的 `levels/` 目录。
-重启 OrcaStudio 后，level 列表里会出现 `pi`，点开就是完整场景。
-
-**第二步：放模型文件（只在新电脑 / 新项目时需要）**
-
-`pi.prefab` 里没有模型，只存路径和资产 ID。模型源文件一共 45 个，按文件夹放在
-`orcastudio/assets/importer/` 下：
-
-```
-importer/
-├── g1_pick/
-│   └── meshes/            42 个（G1 每个连杆一个 .stl/.obj）
-├── table_only.usda        桌面
-├── box_container.usda     盒子
-└── red_cube_5cm.usda      方块
-```
-
-把这个 `importer` 目录整个拷到项目里：
+**第一步：把 level 文件放进 OrcaStudio 项目**
 
 ```bash
-# PROJ = 放着 levels/ 和 assets/ 的那一层目录
-PROJ="<OrcaStudio 项目根>"
-cp -r orcastudio/assets/importer/* "$PROJ/assets/importer/"
+mkdir -p "$PROJ/Levels/pi"
+cp -r $REPO/orcastudio/levels/pi/. "$PROJ/Levels/pi/"
 ```
 
-OrcaStudio 打开项目时会自动导入这 3 个 usda 和网格，在 `Cache/<平台>/assets/importer/`
-下生成 `.azmodel / .azlod / .azbuffer / .azmaterial / .procprefab` 缓存文件
-（自动生成，仓库里不放，也不用手动复制）。等导入跑完再打开 `pi` level。
+如果你项目里这个目录叫 `levels`（全小写），把命令里的 `Levels` 改成实际名字。
 
-确认（输出 `42`）：
+**第二步：把模型源文件放进项目**
 
 ```bash
-ls "$PROJ/assets/importer/g1_pick/meshes" | wc -l
+mkdir -p "$PROJ/Assets/Importer"
+cp -r $REPO/orcastudio/assets/importer/. "$PROJ/Assets/Importer/"
 ```
 
-如果打开后桌面/盒子/方块显示成白色方块，说明导入还没跑完：在 OrcaStudio 资产浏览器里
-找到 `table_only.usda`、`box_container.usda`、`red_cube_5cm.usda`，右键重新导入，再重开 level。
+**第三步：检查**（应输出 `pi.prefab` 和 `42`）
+
+```bash
+ls "$PROJ/Levels/pi/pi.prefab"
+ls "$PROJ/Assets/Importer/g1_pick/meshes" | wc -l
+```
+
+**第四步：打开场景**
+
+重启 OrcaStudio，在 level 列表里双击 `pi`。
+场景显式加载后，点击工具栏的「运行 / Play」启动仿真（策略脚本连的 gRPC 服务就在这里启动）。
+
+正常结果（有 `LISTEN` 行即成功）：
+
+```bash
+ss -lnt | grep 50051
+```
+
+如果打开后桌面/盒子/方块显示成白色方块：在 OrcaStudio 资产浏览器里找到
+`table_only.usda`、`box_container.usda`、`red_cube_5cm.usda`，右键「重新导入」，
+等导入完成后重新打开 level。`Cache/` 下的 `.azmodel` 等文件是自动生成的，仓库里不放，也不用管。
 
 **场景内的名字**：实体 `g1_pick_usda`、`box_container_usda`、`table_only_usda`、
 `red_cube_5cm_usda`；相机 `Camera`（第三人称全局）、`camera_right`（右腕）。
-采集/推理统一用 `--agent_name g1_pick_usda --level pi`。
+采集/推理统一用 `--agent_name g1_pick_usda --level pi`，两路相机用 `Camera,wrist_r`。
 
 > `models/g1_table_scene/` 是不依赖 OrcaStudio 的纯 MuJoCo 桌面场景素材，可按需单独使用。
 
 ### 4.2 数据（已附带，可跳过）
 
-训练直接用 `dataset/lerobot_g1_pick_v6/`，无需重新转换。
+训练直接用 `dataset/lerobot_g1_pick_v6/`，**不需要**重新采集或转换。
 
-若要重新采集或转换：
+只有你要重新采集 / 转换时才继续（在 `orcalab_26.9.1` 环境里执行）：
 
 ```bash
-# 0) 采集脚本与数据落盘模块拷回 OrcaManipulation 仓库
-cp -r scripts/collection/* <OrcaManipulation>/src/examples/dataCollection/
-cp scripts/collection/g1_dex1_data_storage.py <OrcaManipulation>/src/dataStorage/
-cd <OrcaManipulation>
+conda activate orcalab_26.9.1
+cd $ORCA_REPO
 
 # 遥操作采集（Pico）：左 Grip 开始/结束一集，右 Grip 丢弃本集
-python src/examples/dataCollection/g1_dex1_collection_tele.py --level pi --agent_name g1_pick_usda
-
-# DAgger 纠正采集：模型闭环 → 偏离/停滞时 Pico 接管 → 整段落盘
-python src/examples/dataCollection/dagger_release_collect.py \
-  --init-state <失败状态快照.npz> --lerobot-root <数据集根> --level pi
-
-# 转换（回到本仓库根执行；DAgger 集必须带 --trim-takeover 和夹爪反解）
-cd <本仓库>
-python scripts/convert/convert_g1_to_lerobot.py \
-  --dataset-root dataset/g1_pick_usda/pi \
-  --output ./lerobot_g1_pick_v6 \
-  --overwrite --trim-takeover --gripper-action-from-force
-
-# 多版本合并（重编号 episode / 合并 videos+meta / 删除过期 norm_stats）
-python scripts/convert/append_lerobot_episodes.py \
-  --base <旧数据集> --add <新增数据集> --out <输出数据集>
+python src/examples/dataCollection/g1_dex1_collection_tele.py \
+  --level pi --agent_name g1_pick_usda --cameras Camera,wrist_r
 ```
 
-第 0 步里的 `g1_dex1_data_storage.py` 相对上游有一处关键改动：每集 HDF5 写入固定语言指令
-（`Pick up the red cube and place it in the box.`）并同步写到根属性。不覆盖的话，采集出的
-Episode 没有 `task_description`，转换后 LeRobot 的 task 字段为空，训练的 prompt 就错了。
+数据会写到 `$ORCA_REPO/src/examples/dataCollection/dataset/g1_pick_usda/pi/<目录>/`
+（`record/*.hdf5` + `video/*.mp4`）。
 
-转换后必须重算归一化统计：
+```bash
+# DAgger 纠正采集：模型闭环 → 偏离/停滞时 Pico 接管 → 整段落盘
+# 需要先按 4.5 节启动策略服务；默认从数据集 episode0 首帧姿态开始
+python src/examples/dataCollection/dagger_release_collect.py \
+  --level pi --lerobot-root $REPO/dataset/lerobot_g1_pick_v6
+```
+
+> `--init-state` 可以额外指定一个失败状态快照（`.npz`，含 `q9` / `qpos` / `qvel`），
+> 从失败现场继续采集。本仓库不附带这类快照，所以上面的命令不传它。
+
+转换（HDF5 + 两路 mp4 → LeRobot v2.1）：
+
+```bash
+conda activate orcalab_26.9.1
+NEW=$HOME/lerobot_g1_pick_v6_rebuild
+cd $REPO
+python scripts/convert/convert_g1_to_lerobot.py \
+  --dataset-root $ORCA_REPO/src/examples/dataCollection/dataset/g1_pick_usda/pi \
+  --output $NEW \
+  --overwrite --trim-takeover --gripper-action-from-force
+```
+
+> 重新转换只能得到 55 集：ep0 / ep11 / ep47–49 这 5 条的原始采集目录已被后续采集覆盖，
+> 仓库不含它们的原始数据（详见第 5 节）。训练请直接用自带的 60 集数据集。
+
+要把新采集的数据并进已有数据集：
+
+```bash
+python scripts/convert/append_lerobot_episodes.py \
+  --base $REPO/dataset/lerobot_g1_pick_v6 --add $NEW --out $HOME/lerobot_merged
+```
+
+换了数据集就要重算归一化统计：先把 4.3 第 2 步的 `repo_id` 改成新数据集路径，再执行
 
 ```bash
 cd $OPENPI_ROOT
@@ -226,33 +351,71 @@ uv run scripts/compute_norm_stats.py --config-name pi05_g1_pick_cube_lora_v6
 
 ### 4.3 训练
 
+**前置**：训练从 v2/1999 起，先把 4.4 节里 v2 权重的「下载 + 解压」做完。
+
 > **起点约定**：下面 4.3 写的是 v6 当初**怎么来的**（从 v2/1999 起训 2000 步），仅用于复现 v6。
 > 后续任何继续训练一律以 **v6/1999** 为起点，不再从 v2 起训：
 >
 > - 新数据再微调：新建 config（如 `pi05_g1_pick_cube_lora_v7`），`weight_loader` 指向
->   `checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999/params`，学习率降到 peak 1e-5
+>   `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999/params`，学习率降到 peak 1e-5
 > - 同数据继续练更多步：同一 config 加 `--resume`，`checkpoint_dir` 指向 v6 输出目录，
 >   会从 `train_state/` 恢复 optimizer / 步数 / EMA（先把 v6 的 `1999/` 备份一份）
 
+**第 1 步：确认 openpi 改动已就位**
+
+第 3.3 节已经拷过；如果你跳过了，补一次：
+
 ```bash
-# 1) 把 openpi 改动和训练脚本打到 openpi
-cp -r openpi_changes/* $OPENPI_ROOT/
-cp configs/train_g1_pick_cube.sh $OPENPI_ROOT/
+cp -r $REPO/openpi_changes/* $OPENPI_ROOT/
+cp $REPO/configs/train_g1_pick_cube.sh $OPENPI_ROOT/
+```
 
-# 2) 改绝对路径，共 5 处
-#    config.py（pi05_g1_pick_cube_lora_v6）
-#      - repo_id       → 本仓库 dataset/lerobot_g1_pick_v6
-#      - weight_loader → v2/1999 params 目录（见 4.4）
-#    train_g1_pick_cube.sh
-#      - OPENPI_DIR / DATASET_DIR / INIT_PARAMS
+**第 2 步：把两条绝对路径改成你机器上的路径**
 
-# 3) 从 v2 的 1999 步继续微调 2000 步
+```bash
+cd $OPENPI_ROOT
+sed -i "s|repo_id=\"/home/user/pi/lerobot_g1_pick_v6\"|repo_id=\"$REPO/dataset/lerobot_g1_pick_v6\"|" src/openpi/training/config.py
+sed -i "s|/home/user/openpi/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params|$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params|g" src/openpi/training/config.py
+```
+
+正常结果（第一条能打印出新路径；第二条输出 `4`）：
+
+```bash
+grep -n "repo_id=\"$REPO/dataset/lerobot_g1_pick_v6\"" src/openpi/training/config.py
+grep -c "$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params" src/openpi/training/config.py
+```
+
+**第 3 步：先跑 100 步，确认不 OOM、能存盘**
+
+```bash
+export OPENPI_DIR=$OPENPI_ROOT
+export DATASET_DIR=$REPO/dataset/lerobot_g1_pick_v6
+export INIT_PARAMS=$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params
+
+cd $OPENPI_ROOT && bash train_g1_pick_cube.sh debug
+```
+
+正常结果：日志持续打印 `step` 和 loss，不出现 `CUDA out of memory`；
+结束后生成 `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_debug_unified/99/`：
+
+```bash
+ls $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_debug_unified/99
+```
+
+**第 4 步：正式训练 2000 步**
+
+```bash
 cd $OPENPI_ROOT && bash train_g1_pick_cube.sh full
 ```
 
-训练产物目录 = `$OPENPI_ROOT/checkpoints/<config.name>/<exp_name>/<step>/`，
-脚本里 `EXP_NAME=g1_pick_cube_lora_v6_unified`，所以最终落在
-`checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999/`，与 4.4 的路径一致。
+正常结果：checkpoint 每 250 步存一次，最终目录为
+`$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999/`：
+
+```bash
+ls $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified
+```
+
+> 训练脚本启动时会检查 `$DATASET_DIR/norm_stats.json`；本仓库数据集已自带，不会重算。
 
 v6 训练配置：
 
@@ -279,37 +442,47 @@ v6 训练配置：
 | [`weights-v6-1999`](https://github.com/xcdgdj/pi0.5_g1_pick_and_place/releases/tag/weights-v6-1999) | **推理/评估**（本文成绩单） | 2.0 + 2.0 + 1.5 GB | `eef5c8701cc3088cd432ce6b2ab63941` |
 | [`weights-v2-1999`](https://github.com/xcdgdj/pi0.5_g1_pick_and_place/releases/tag/weights-v2-1999) | **重训 v6 的初始化权重** | 2.0 + 2.0 + 1.5 GB | `2a993088493448f4ff52c1b0d6a7b378` |
 
-下载、校验、解压 —— v6（推理用，直接照抄）：
+#### v6（推理/评估用，必下）
 
 ```bash
-mkdir -p ~/weights && cd ~/weights
+mkdir -p $HOME/weights && cd $HOME/weights
 BASE=https://github.com/xcdgdj/pi0.5_g1_pick_and_place/releases/download/weights-v6-1999
 for f in pi05_g1_pick_cube_lora_v6_1999.tar.00.part \
          pi05_g1_pick_cube_lora_v6_1999.tar.01.part \
          pi05_g1_pick_cube_lora_v6_1999.tar.02.part MD5SUMS.parts; do
   curl -L -O $BASE/$f
 done
+```
 
-md5sum -c MD5SUMS.parts                                   # 3 行都要 OK
-cat pi05_g1_pick_cube_lora_v6_1999.tar.0*.part | md5sum   # eef5c8701cc3088cd432ce6b2ab63941
+正常结果（`md5sum -c` 输出 3 行 `OK`；合并 MD5 等于 `eef5c8701cc3088cd432ce6b2ab63941`）：
 
+```bash
+md5sum -c MD5SUMS.parts
+cat pi05_g1_pick_cube_lora_v6_1999.tar.0*.part | md5sum
+```
+
+解压（`mkdir -p` 不能省，`tar -C` 要求目标目录已存在；压缩包根目录就是 `1999/`）：
+
+```bash
+mkdir -p $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified
 cat pi05_g1_pick_cube_lora_v6_1999.tar.0*.part | tar -xf - \
   -C $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified
+ls $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified
 ```
 
-装了 `gh` 的话可以一条命令下完：
+正常结果：输出 `1999`。
+
+装了 `gh` 的话可以一条命令下完（省掉上面的 `curl` 循环，后面校验/解压照旧）：
 
 ```bash
-# v6
-gh release download weights-v6-1999 -R xcdgdj/pi0.5_g1_pick_and_place -D ~/weights
-# v2
-gh release download weights-v2-1999 -R xcdgdj/pi0.5_g1_pick_and_place -D ~/weights_v2
+gh release download weights-v6-1999 -R xcdgdj/pi0.5_g1_pick_and_place -D $HOME/weights
+gh release download weights-v2-1999 -R xcdgdj/pi0.5_g1_pick_and_place -D $HOME/weights_v2
 ```
 
-下载、校验、解压 —— v2（只有重训 v6 才需要）：
+#### v2（只有重新训练 v6 才需要）
 
 ```bash
-mkdir -p ~/weights_v2 && cd ~/weights_v2
+mkdir -p $HOME/weights_v2 && cd $HOME/weights_v2
 BASE=https://github.com/xcdgdj/pi0.5_g1_pick_and_place/releases/download/weights-v2-1999
 for f in pi05_g1_pick_cube_lora_v2_1999.tar.00.part \
          pi05_g1_pick_cube_lora_v2_1999.tar.01.part \
@@ -320,11 +493,14 @@ done
 md5sum -c MD5SUMS.parts                                   # 3 行都要 OK
 cat pi05_g1_pick_cube_lora_v2_1999.tar.0*.part | md5sum   # 2a993088493448f4ff52c1b0d6a7b378
 
+mkdir -p $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified
 cat pi05_g1_pick_cube_lora_v2_1999.tar.0*.part | tar -xf - \
   -C $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified
 ```
 
-**放到哪**
+正常结果：`ls $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified` 输出 `1999`。
+
+#### 放到哪
 
 | 你要做的事 | 需要 | 解压到 |
 |---|---|---|
@@ -334,7 +510,14 @@ cat pi05_g1_pick_cube_lora_v2_1999.tar.0*.part | tar -xf - \
 路径那两层目录名（`pi05_..._v6/` 和 `g1_pick_cube_lora_v6_unified/`）必须原样保留，
 openpi 按这个名字找权重，改了就报找不到。
 
-**`1999/` 目录里是什么**
+#### 拷完检查（应输出 `6` 和约 `5.1G`）
+
+```bash
+CKPT=$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999
+ls $CKPT/params | wc -l && du -sh $CKPT/params
+```
+
+`1999/` 目录内容：
 
 ```
 1999/
@@ -345,56 +528,78 @@ openpi 按这个名字找权重，改了就报找不到。
 └── _CHECKPOINT_METADATA
 ```
 
-**为什么有两个版本**
+为什么有两个版本：
 
 - v2/1999：v6 训练的起点（50 集基线训 20000 步的结果），只在重训时用
 - v6/1999：最终权重，本文第 1 节的 80% 成功率就是用它跑出来的
 
-**拷完检查**（应输出 `6`，以及约 `5.1G`）：
-
-```bash
-CKPT=$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999
-ls $CKPT/params | wc -l && du -sh $CKPT/params
-```
-
 ### 4.5 推理
 
+跑之前确认 3 件事：
+
+1. OrcaStudio 已打开 level `pi` 并点了「运行」，`ss -lnt | grep 50051` 有输出
+2. v6 权重已按 4.4 节解压到 `.../g1_pick_cube_lora_v6_unified/1999`
+3. 推理脚本已在 `$ORCA_REPO/src/examples/dataCollection/`（第 3.5 节拷过）
+
+**终端 A：启动策略服务**（openpi 目录，`uv` 环境；第一次加载权重较慢，等日志出现服务启动再动）
+
 ```bash
-# 策略服务（在 openpi 仓库根，用 openpi 自己的 uv 环境）
 cd $OPENPI_ROOT
 OPENPI_POLICY_SEED=3 CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_PREALLOCATE=false \
 uv run scripts/serve_policy.py policy:checkpoint \
   --policy.config pi05_g1_pick_cube_lora_v6 \
   --policy.dir $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999
+```
 
-# 闭环推理（在 OrcaManipulation 仓库根，conda 环境 orcalab_26.9.1）
-cd <OrcaManipulation>
-python src/examples/dataCollection/infer_g1_pick.py --policy server \
+正常结果：日志出现 `策略采样种子已设为 3`、`Creating server (host: ..., ip: ...)`，进程保持运行不退出。
+
+**终端 B：跑闭环推理**（OrcaManipulation 目录，conda 环境）
+
+```bash
+conda activate orcalab_26.9.1
+cd $ORCA_REPO
+python src/examples/dataCollection/infer_g1_pick.py \
   --host 127.0.0.1 --port 8000 --execution-steps 10 --max-steps 600 \
-  --success-hold 30 --lerobot-root <本仓库>/dataset/lerobot_g1_pick_v6
+  --success-hold 30 --lerobot-root $REPO/dataset/lerobot_g1_pick_v6
+```
+
+正常结果：依次出现
+
+```
+[初始姿态] 数据集 [...] / 写入仿真 [...] / 实际 [...]
+[策略] 连接 ws://127.0.0.1:8000 ...
+[策略] 已连接 metadata=...
+[相机] simulate_index 可用 ...
+[循环] 步    0  TCP→方块=...cm ...
+...
+[结果] 放置成功（步 XXX，盒内稳定 30 步）...
 ```
 
 `--lerobot-root` 必须指向本仓库的数据集：脚本要从里面读 `norm_stats.json` 和
 `data/chunk-000/episode_000000.parquet`（后者首帧的 9 维 state 用于把机器人摆到初始姿态）。
 脚本内默认值是旧的 `/home/user/pi/lerobot_g1_pick`，不传会直接报找不到文件。
 
+如果报 `ModuleNotFoundError: openpi_client`，说明 3.4 节的
+`pip install -e $OPENPI_ROOT/packages/openpi-client` 没执行，补执行一次再重跑。
+
 ### 4.6 复现成功率评估
 
 评估就是按第 1 节的协议跑 `infer_g1_pick.py`，每次一个全新进程：
 
 ```bash
-REPO=<本仓库>
-cd <OrcaManipulation>
+conda activate orcalab_26.9.1
+cd $ORCA_REPO
 for i in $(seq 1 10); do
-  python src/examples/dataCollection/infer_g1_pick.py --policy server --host 127.0.0.1 --port 8000 \
-    --execution-steps 10 --max-steps 600 --success-hold 30 \
-    --lerobot-root $REPO/dataset/lerobot_g1_pick_v6 --trace /tmp/run_$i.npz
+  python src/examples/dataCollection/infer_g1_pick.py \
+    --host 127.0.0.1 --port 8000 --execution-steps 10 --max-steps 600 \
+    --success-hold 30 --lerobot-root $REPO/dataset/lerobot_g1_pick_v6 \
+    --trace /tmp/run_$i.npz
   # 本轮结束后在 OrcaStudio 里 reset 场景，让方块/盒子回到 level 初始位置
 done
 ```
 
 **reset 的确切含义**：新进程启动时会 `env.reset()` 并把机器人摆回数据集 episode 0 的首帧姿态
-（[infer_g1_pick.py#L480-L496](scripts/infer/infer_g1_pick.py#L480-L496)）；
+（见 [infer_g1_pick.py#L480-L501](scripts/infer/infer_g1_pick.py#L480-L501)）；
 方块和盒子的位置来自 level 初始状态，所以要保证每轮开始前方块在默认位置——脚本不会替你把方块搬回去。
 
 - 成功判据由脚本内的 `success_radius / success_floor_tol / success_speed / success_hold` 实现，
@@ -464,6 +669,25 @@ done
 
 ---
 
-## 8. 许可
+## 8. 文件完整性自检
+
+在 `$REPO` 下执行，输出应逐项对上（括号里是期望值）：
+
+```bash
+cd $REPO
+echo "数据集 parquet : $(ls dataset/lerobot_g1_pick_v6/data/chunk-000/*.parquet | wc -l)  (期望 60)"
+echo "数据集 mp4     : $(find dataset/lerobot_g1_pick_v6/videos -name '*.mp4' | wc -l)  (期望 120)"
+echo "原始采集目录   : $(ls dataset/g1_pick_usda/pi | wc -l)  (期望 55)"
+echo "场景网格       : $(ls orcastudio/assets/importer/g1_pick/meshes | wc -l)  (期望 42)"
+echo "openpi 改动    : $(find openpi_changes -type f | wc -l)  (期望 8)"
+echo "推理脚本       : $(ls scripts/infer/*.py | wc -l)  (期望 5)"
+md5sum dataset/lerobot_g1_pick_v6/norm_stats.json checkpoints/norm_stats.json
+```
+
+最后两行 MD5 必须完全相同（两行都是 `c829c3bdd75ec1d70b774f87b61c5e42`）。
+
+---
+
+## 9. 许可
 
 仅供合作研究使用；G1 机器人模型版权归 Unitree 所有。
