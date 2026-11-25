@@ -105,6 +105,12 @@ openpi 侧全部改动、以及 v6 权重的实测闭环成功率。
 
 ## 4. 复现顺序
 
+> **脚本路径约定**：`scripts/collection/` 与 `scripts/infer/` 是按 OrcaManipulation 仓库
+> （`OrcaManipulation_g1_pick_tube`）内的相对路径镜像的，运行时需拷回该仓库对应位置
+> （`src/examples/dataCollection/`），并把 `scripts/convert/`、`configs/` 放在任意工作目录即可。
+> 采集与推理都在 conda 环境 `orcalab_26.9.1` 下执行，通过 gRPC 连接 `localhost:50051` 的
+> OrcaGym 服务（OrcaStudio 里先启动场景）。
+
 ### 4.1 导入场景
 
 1. 打开 OrcaStudio，资产中心订阅 `testtube_operation`（作者 Orca）
