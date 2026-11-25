@@ -117,8 +117,11 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 > - `scripts/convert/`、`configs/` 是独立脚本，放任意目录执行
 > - 采集与推理都在 conda 环境 `orcalab_26.9.1` 下执行，通过 gRPC 连接 `localhost:50051`
 >   的 OrcaGym 服务（先在 OrcaStudio 里启动 level `pi`）
-> - OrcaManipulation 仓库**不随本仓库分发**，需自备；采集/推理依赖它的
->   `src/envs/dataCollection/data_collection_env.py`（`ENTRY_POINT` 指向这里）
+> - OrcaManipulation 仓库**不随本仓库分发**，需自备：
+>   `git clone -b g1_pick_tube https://github.com/openverse-orca/OrcaManipulation.git`
+>   采集/推理依赖它的 `src/envs/dataCollection/data_collection_env.py`（`ENTRY_POINT` 指向这里）。
+>   注意：`infer_g1_pick.py`、`dagger_release_collect.py`、`replay_lerobot_demo.py` 等
+>   脚本上游仓库里没有，必须从本仓库 `scripts/` 拷入
 
 ### 4.1 导入场景（自建 level「pi」）
 
@@ -186,8 +189,9 @@ ls "$PROJ/assets/importer/g1_pick/meshes" | wc -l
 若要重新采集或转换：
 
 ```bash
-# 0) 采集脚本拷回 OrcaManipulation 仓库
+# 0) 采集脚本与数据落盘模块拷回 OrcaManipulation 仓库
 cp -r scripts/collection/* <OrcaManipulation>/src/examples/dataCollection/
+cp scripts/collection/g1_dex1_data_storage.py <OrcaManipulation>/src/dataStorage/
 cd <OrcaManipulation>
 
 # 遥操作采集（Pico）：左 Grip 开始/结束一集，右 Grip 丢弃本集
@@ -208,6 +212,10 @@ python scripts/convert/convert_g1_to_lerobot.py \
 python scripts/convert/append_lerobot_episodes.py \
   --base <旧数据集> --add <新增数据集> --out <输出数据集>
 ```
+
+第 0 步里的 `g1_dex1_data_storage.py` 相对上游有一处关键改动：每集 HDF5 写入固定语言指令
+（`Pick up the red cube and place it in the box.`）并同步写到根属性。不覆盖的话，采集出的
+Episode 没有 `task_description`，转换后 LeRobot 的 task 字段为空，训练的 prompt 就错了。
 
 转换后必须重算归一化统计：
 
