@@ -330,7 +330,7 @@ python src/examples/dataCollection/g1_dex1_collection_tele.py \
 
 ```bash
 # DAgger 纠正采集：模型闭环 → 偏离/停滞时 Pico 接管 → 整段落盘
-# 需要先按 4.5 节启动策略服务；默认从数据集 episode0 首帧姿态开始
+# 需要先按 4.5 节启动策略服务；默认从零位（手臂 6 关节全 0）+ 夹爪全开开始
 python src/examples/dataCollection/dagger_release_collect.py \
   --level pi --lerobot-root $REPO/dataset/lerobot_g1_pick_v6
 ```
@@ -588,8 +588,9 @@ python src/examples/dataCollection/infer_g1_pick.py \
 [结果] 放置成功（步 XXX，盒内稳定 30 步）...
 ```
 
-`--lerobot-root` 必须指向本仓库的数据集：脚本要从里面读 `norm_stats.json` 和
-`data/chunk-000/episode_000000.parquet`（后者首帧的 9 维 state 用于把机器人摆到初始姿态）。
+`--lerobot-root` 必须指向本仓库的数据集：脚本要从里面读 `norm_stats.json`、
+`meta/info.json` 和 `data/chunk-000/episode_000000.parquet`（用于字段顺序校验）。
+初始姿态固定为手臂零位 + 夹爪全开，不再依赖 episode 0 首帧。
 脚本内默认值是旧的 `/home/user/pi/lerobot_g1_pick`，不传会直接报找不到文件。
 
 如果报 `ModuleNotFoundError: openpi_client`，说明 3.4 节的
@@ -611,8 +612,8 @@ for i in $(seq 1 10); do
 done
 ```
 
-**reset 的确切含义**：新进程启动时会 `env.reset()` 并把机器人摆回数据集 episode 0 的首帧姿态
-（见 [infer_g1_pick.py#L480-L501](scripts/infer/infer_g1_pick.py#L480-L501)）；
+**reset 的确切含义**：新进程启动时会 `env.reset()`，并把机器人右臂摆到零位、夹爪张开
+（见 [infer_g1_pick.py#L483-L502](scripts/infer/infer_g1_pick.py#L483-L502)）；
 方块和盒子的位置来自 level 初始状态，所以要保证每轮开始前方块在默认位置——脚本不会替你把方块搬回去。
 
 - 成功判据由脚本内的 `success_radius / success_floor_tol / success_speed / success_hold` 实现，

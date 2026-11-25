@@ -483,9 +483,11 @@ class OrcaGymG1:
         self.helpers.apply_grasp_solver_tuning(self.env)
         self.helpers.pin_all_joints(self.env, self.cfg.agent_name)
 
-        # 初始姿态：把数据集第 0 帧的 9 维 state 写进仿真。
+        # 初始姿态：零位（手臂 6 关节全 0）+ 夹爪全开（取数据集 q01）
         # 夹爪两维先经与运行时相同的映射，再写入关节。
-        raw9 = self.states9[0].astype(np.float64)
+        raw9 = np.zeros(ACTION_DIM, dtype=np.float64)
+        raw9[ARM_DIM:] = np.asarray(self.ns["q01"][ARM_DIM:], dtype=np.float64)
+        self.init9 = raw9.copy()
         target9 = raw9.copy()
         for i in range(ACTION_DIM - ARM_DIM):
             target9[ARM_DIM + i] = dataset_grip_to_sim(raw9[ARM_DIM + i], self.ns, self.cfg.grip_range)
@@ -881,7 +883,7 @@ class OrcaGymG1:
                 self.env.render()
 
     def settle(self):
-        init9 = self.states9[0]
+        init9 = self.init9
         for _ in range(self.cfg.settle_frames):
             for _s in range(SUBSTEPS):
                 ctrl = np.zeros(self.env.nu, dtype=np.float32)
