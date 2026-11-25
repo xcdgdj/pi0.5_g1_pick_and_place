@@ -1,10 +1,10 @@
 # pi0.5 G1 抓取放置复现包（v6）
 
-G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio「试管操作」场景中
+G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建场景「pi」中
 **抓起红色方块并放进盒子**。基于 pi0.5（PaliGemma 2B + 300M 动作专家，LoRA 微调）。
 
-本仓库包含：场景/模型、60 集训练数据、采集→转换→训练→推理→评估全链路脚本、
-openpi 侧全部改动、以及 v6 权重的实测闭环成功率。
+本仓库包含：OrcaStudio 场景（level `pi` + 搭建用 4 个 xml）、60 集训练数据、
+采集→转换→训练→推理→评估全链路脚本、openpi 侧全部改动、以及 v6 权重的实测闭环成功率。
 
 ---
 
@@ -59,10 +59,10 @@ openpi 侧全部改动、以及 v6 权重的实测闭环成功率。
 
 ```
 .
-├── models/                     MuJoCo 模型
+├── models/                     MuJoCo 模型（搭建 level pi 的 xml 源头）
 │   ├── g1_pick.xml                 机器人本体（OrcaStudio 版，DEX1 手指网格不带碰撞）
 │   ├── assets/                     网格与材质
-│   └── g1_table_scene/             纯 MuJoCo 桌面抓取场景（table/box/cube + 带碰撞的 G1）
+│   └── g1_table_scene/             table_only.xml / box_container.xml / red_cube_5cm.xml（纯 MuJoCo 也可单独跑）
 ├── dataset/
 │   ├── lerobot_g1_pick_v6/    ★ 训练数据集（60 集 / 17105 帧，LeRobot v2.1）
 │   │   ├── data/chunk-000/         episode_000000~000059.parquet
@@ -81,8 +81,9 @@ openpi 侧全部改动、以及 v6 权重的实测闭环成功率。
 │   ├── collection/            遥操作采集链路（Pico + OSC + DEX1），含 DAgger 纠正采集
 │   ├── convert/               HDF5 → LeRobot v2.1、合并、体检、开环验证
 │   └── infer/                 闭环推理、HDF5 回放、LeRobot 示范回放、消融
-├── g1_pick_tube.json          OrcaStudio 布局（layout v4.0）
-├── orcastudio_levels/pi/pi.spawnable   自建 level「pi」（采集脚本 --level pi 用它）
+├── orcastudio/                OrcaStudio 场景「pi」（自建，整目录交付）
+│   ├── levels/pi/pi.prefab         level 文件，把 `pi` 整个文件夹拖入项目 `levels/` 即可打开
+│   └── assets/importer/            prefab 引用的 47 个资产（42 个 G1 网格 + 5 个盒体 azmodel）
 ├── configs/train_g1_pick_cube.sh       训练启动脚本（v6）
 └── checkpoints/
     ├── norm_stats.json              v6 归一化统计（与数据集内同一份）
@@ -95,7 +96,7 @@ openpi 侧全部改动、以及 v6 权重的实测闭环成功率。
 
 | 组件 | 版本/说明 |
 |---|---|
-| OrcaStudio / OrcaLab | 需订阅「试管操作」(testtube_operation) 资产包 |
+| OrcaStudio / OrcaLab | 任意版本即可，**无需订阅任何资产包**（场景由本仓库自带文件搭建） |
 | OrcaGym | conda 环境 `orcalab_26.9.1` |
 | openpi | 官方 Physical-Intelligence/openpi，打上 `openpi_changes/` 里的文件 |
 | 训练硬件 | 2× RTX 4090 24GB（无 NVLink） |
@@ -111,15 +112,26 @@ openpi 侧全部改动、以及 v6 权重的实测闭环成功率。
 > 采集与推理都在 conda 环境 `orcalab_26.9.1` 下执行，通过 gRPC 连接 `localhost:50051` 的
 > OrcaGym 服务（OrcaStudio 里先启动场景）。
 
-### 4.1 导入场景
+### 4.1 导入场景（自建 level「pi」）
 
-1. 打开 OrcaStudio，资产中心订阅 `testtube_operation`（作者 Orca）
-2. 启动场景，选择 `testtube_operation`
-3. 菜单「打开布局」→ 加载本仓库的 `g1_pick_tube.json`
-4. 机器人由 `models/g1_pick.xml` 加载，`--agent_name g1_pick_usda`
+场景**不是订阅资产包**，而是用下面 4 个 MuJoCo xml 在 OrcaStudio 里搭建后保存为 level `pi`：
 
-自建 level `pi` 的场景文件在 `orcastudio_levels/pi/pi.spawnable`，放到 OrcaStudio 的
-`Cache/<平台>/levels/pi/` 下并重启编辑器即可在 level 列表里看到 `pi`。
+| 实体名（level 内） | 来源 xml | 内容 |
+|---|---|---|
+| `g1_pick_usda` | `models/g1_pick.xml` | G1 本体（右臂 6 关节力矩 motor + DEX1 两指） |
+| `table_only_usda` | `models/g1_table_scene/table_only.xml` | 桌面（`table_top` + 4 条腿） |
+| `box_container_usda` | `models/g1_table_scene/box_container.xml` | 目标盒子 |
+| `red_cube_5cm_usda` | `models/g1_table_scene/red_cube_5cm.xml` | 5 cm 红色方块 |
+
+打开方式：
+
+1. 把 `orcastudio/levels/pi` **整个文件夹**拖入 OrcaStudio 项目的 `levels/` 下
+2. 把 `orcastudio/assets/importer/` 合并进项目的 `assets/importer/`（prefab 里有 47 个
+   `assets/importer/...` 引用：42 个 `g1_pick/meshes/*.stl|obj` + 5 个
+   `default_box_container_*.usda.azmodel`，缺一个都会显示为占位符）
+3. 重启 OrcaStudio，level 列表里出现 `pi`，打开即可
+4. 相机：`Camera`（第三人称全局）、`camera_right`（右腕）；采集/推理统一用
+   `--agent_name g1_pick_usda --level pi`
 
 > `models/g1_table_scene/` 是不依赖 OrcaStudio 的纯 MuJoCo 桌面场景素材，可按需单独使用。
 
@@ -291,4 +303,4 @@ done
 
 ## 8. 许可
 
-仅供合作研究使用；OrcaStudio 场景资产版权归 Orca 所有。
+仅供合作研究使用；G1 机器人模型版权归 Unitree 所有。
