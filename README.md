@@ -123,15 +123,51 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 | `box_container_usda` | `models/g1_table_scene/box_container.xml` | 目标盒子 |
 | `red_cube_5cm_usda` | `models/g1_table_scene/red_cube_5cm.xml` | 5 cm 红色方块 |
 
-打开方式：
+打开方式（两步）：
 
-1. 把 `orcastudio/levels/pi` **整个文件夹**拖入 OrcaStudio 项目的 `levels/` 下
-2. 把 `orcastudio/assets/importer/` 合并进项目的 `assets/importer/`（prefab 里有 47 个
-   `assets/importer/...` 引用：42 个 `g1_pick/meshes/*.stl|obj` + 5 个
-   `default_box_container_*.usda.azmodel`，缺一个都会显示为占位符）
-3. 重启 OrcaStudio，level 列表里出现 `pi`，打开即可
-4. 相机：`Camera`（第三人称全局）、`camera_right`（右腕）；采集/推理统一用
-   `--agent_name g1_pick_usda --level pi`
+**第一步：放场景文件**
+
+把 `orcastudio/levels/pi` 这个文件夹整个拖进 OrcaStudio 项目的 `levels/` 目录。
+重启 OrcaStudio 后，level 列表里会出现 `pi`，点开就是完整场景。
+
+**第二步：放模型文件（只在新电脑 / 新项目时需要）**
+
+`pi.prefab` 文件本身不包含模型，只记录文件路径。它引用了 47 个模型文件：
+
+- `g1_pick/meshes/` 下 42 个：G1 机器人各个零件的网格
+- `default_box_container_*.usda.azmodel` 5 个：**同一个盒子**的 1 块底 + 4 块侧板
+  （`box_container.usda` 里就是 5 个 `def Mesh`：`container_bottom_col` 和四个
+  `container_wall_{x,y}_{pos,neg}_col`，导入时每块生成一个 azmodel，不是 5 个盒子）
+
+这些路径写死在 prefab 里，所以要按原样复制到项目里（路径不能改、不能摊平）：
+
+```bash
+# PROJ = 放着 levels/ 和 assets/ 的那一层目录
+PROJ="<OrcaStudio 项目根>"
+cp -r orcastudio/assets/importer/* "$PROJ/assets/importer/"
+```
+
+复制完目录应该长这样：
+
+```
+$PROJ/assets/importer/
+├── g1_pick/meshes/*.stl *.obj                42 个
+└── default_box_container_*.usda.azmodel      5 个
+```
+
+确认对不对（两条命令分别输出 `42` 和 `5`）：
+
+```bash
+ls "$PROJ/assets/importer/g1_pick/meshes" | wc -l
+ls "$PROJ/assets/importer"/default_box_container_*.usda.azmodel | wc -l
+```
+
+少一个文件不会报错，只是对应零件变成白色占位块（机器人缺零件、盒子缺一面），
+物理和脚本仍然正常。已在本机跑过的不需要重复做，先跑上面的命令确认即可。
+
+**场景内的名字**：实体 `g1_pick_usda`、`box_container_usda`、`table_only_usda`、
+`red_cube_5cm_usda`；相机 `Camera`（第三人称全局）、`camera_right`（右腕）。
+采集/推理统一用 `--agent_name g1_pick_usda --level pi`。
 
 > `models/g1_table_scene/` 是不依赖 OrcaStudio 的纯 MuJoCo 桌面场景素材，可按需单独使用。
 
