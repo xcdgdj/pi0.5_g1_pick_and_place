@@ -300,7 +300,9 @@ cat pi05_g1_pick_cube_lora_v6_1999.tar.0*.part | tar -xf - \
 装了 `gh` 的话可以一条命令下完：
 
 ```bash
+# v6
 gh release download weights-v6-1999 -R xcdgdj/pi0.5_g1_pick_and_place -D ~/weights
+# v2
 gh release download weights-v2-1999 -R xcdgdj/pi0.5_g1_pick_and_place -D ~/weights_v2
 ```
 
