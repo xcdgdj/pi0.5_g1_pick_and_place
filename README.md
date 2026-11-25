@@ -223,6 +223,24 @@ diff $ORCA_REPO/src/dataStorage/g1_dex1_data_storage.py $REPO/scripts/collection
   `Pick up the red cube and place it in the box.`。不覆盖的话，采集出的 Episode 没有
   `task_description`，转换后 LeRobot 的 task 字段为空，训练的 prompt 就错了。
 
+### 3.6 改 openpi 配置里的两条绝对路径（必做）
+
+`openpi_changes` 里的 `config.py` 用的是作者机器上的绝对路径。**只跑推理也要做这一步**，
+因为策略服务会从 `repo_id` 指向的数据集目录读取归一化统计 `norm_stats.json`。
+
+```bash
+cd $OPENPI_ROOT
+sed -i "s|repo_id=\"/home/user/pi/lerobot_g1_pick_v6\"|repo_id=\"$REPO/dataset/lerobot_g1_pick_v6\"|" src/openpi/training/config.py
+sed -i "s|/home/user/openpi/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params|$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params|g" src/openpi/training/config.py
+```
+
+正常结果（第一条打印出新数据集路径；第二条输出 `4`）：
+
+```bash
+grep -n "repo_id=\"$REPO/dataset/lerobot_g1_pick_v6\"" src/openpi/training/config.py
+grep -c "$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params" src/openpi/training/config.py
+```
+
 ---
 
 ## 4. 复现顺序
@@ -231,7 +249,7 @@ diff $ORCA_REPO/src/dataStorage/g1_dex1_data_storage.py $REPO/scripts/collection
 
 按顺序做这 5 步，不用采集、不用训练：
 
-1. 装环境：第 3.2 ~ 3.5 节
+1. 装环境并改配置路径：第 3.2 ~ 3.6 节
 2. 放场景并打开 level `pi`：4.1 节
 3. 下载 v6 权重并解压：4.4 节第一段
 4. 启动策略服务：4.5 节「终端 A」
@@ -370,20 +388,15 @@ cp -r $REPO/openpi_changes/* $OPENPI_ROOT/
 cp $REPO/configs/train_g1_pick_cube.sh $OPENPI_ROOT/
 ```
 
-**第 2 步：把两条绝对路径改成你机器上的路径**
+**第 2 步：确认路径已改（第 3.6 节做过就跳过，只做检查）**
 
 ```bash
 cd $OPENPI_ROOT
-sed -i "s|repo_id=\"/home/user/pi/lerobot_g1_pick_v6\"|repo_id=\"$REPO/dataset/lerobot_g1_pick_v6\"|" src/openpi/training/config.py
-sed -i "s|/home/user/openpi/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params|$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params|g" src/openpi/training/config.py
-```
-
-正常结果（第一条能打印出新路径；第二条输出 `4`）：
-
-```bash
 grep -n "repo_id=\"$REPO/dataset/lerobot_g1_pick_v6\"" src/openpi/training/config.py
 grep -c "$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params" src/openpi/training/config.py
 ```
+
+第一条打印出新路径、第二条输出 `4` 就说明改好了；没有的话回到第 3.6 节执行那两条 `sed`。
 
 **第 3 步：先跑 100 步，确认不 OOM、能存盘**
 
