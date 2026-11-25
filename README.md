@@ -231,18 +231,50 @@ v6 训练配置：
 | 优化器 | AdamW，weight_decay 1e-4，clip 1.0 |
 | 步数 | 2000，每 250 步存 checkpoint |
 
-### 4.4 权重（不在仓库里，要单独拷）
+### 4.4 权重（GitHub Release 分卷下载）
 
-**为什么不在仓库**：每个 checkpoint 5.4 GB（`params/` 5.1 GB + `train_state/` 300 MB），
-超过 GitHub 单文件 100 MB 的上限，传不上去。仓库里只有 `checkpoints/README.md` 和
-`checkpoints/norm_stats.json`，权重本体用移动硬盘 / 网盘单独拷。
+**为什么放 Release**：checkpoint 5.4 GB（`params/` 5.1 GB + `train_state/` 300 MB），
+超过仓库单文件 100 MB 限制。放在本仓库 Release
+[`weights-v6-1999`](https://github.com/xcdgdj/pi0.5_g1_pick_and_place/releases/tag/weights-v6-1999)，
+切成 3 卷（Release 单附件上限 2 GiB）：
 
-**拷哪个**
+| 文件 | 大小 |
+|---|---|
+| `pi05_g1_pick_cube_lora_v6_1999.tar.00.part` | 2.0 GB |
+| `pi05_g1_pick_cube_lora_v6_1999.tar.01.part` | 2.0 GB |
+| `pi05_g1_pick_cube_lora_v6_1999.tar.02.part` | 1.5 GB |
+| `MD5SUMS.parts` | 3 行 MD5 |
 
-| 你要做的事 | 需要拷 | 放到这个目录 |
+下载、校验、解压（三步，直接照抄）：
+
+```bash
+mkdir -p ~/weights && cd ~/weights
+BASE=https://github.com/xcdgdj/pi0.5_g1_pick_and_place/releases/download/weights-v6-1999
+for f in pi05_g1_pick_cube_lora_v6_1999.tar.00.part \
+         pi05_g1_pick_cube_lora_v6_1999.tar.01.part \
+         pi05_g1_pick_cube_lora_v6_1999.tar.02.part MD5SUMS.parts; do
+  curl -L -O $BASE/$f
+done
+
+md5sum -c MD5SUMS.parts                                   # 3 行都要 OK
+cat pi05_g1_pick_cube_lora_v6_1999.tar.0*.part | md5sum   # eef5c8701cc3088cd432ce6b2ab63941
+
+cat pi05_g1_pick_cube_lora_v6_1999.tar.0*.part | tar -xf - \
+  -C $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified
+```
+
+装了 `gh` 的话可以一条命令下完：
+
+```bash
+gh release download weights-v6-1999 -R xcdgdj/pi0.5_g1_pick_and_place -D ~/weights
+```
+
+**放到哪 / 还要不要 v2**
+
+| 你要做的事 | 需要 | 放到这个目录 |
 |---|---|---|
-| 只跑推理、复现成功率 | v6 的 `1999/` | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999/` |
-| 还要重新训练 v6 | 再拷 v2 的 `1999/` | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/` |
+| 只跑推理、复现成功率 | 上面的 v6 权重 | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999/` |
+| 还要重新训练 v6 | 再加 v2 的 `1999/`（不在 Release 里，从原训练机拷） | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/` |
 
 路径那两层目录名（`pi05_..._v6/` 和 `g1_pick_cube_lora_v6_unified/`）必须原样保留，
 openpi 按这个名字找权重，改了就报找不到。
