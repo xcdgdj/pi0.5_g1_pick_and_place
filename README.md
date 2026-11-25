@@ -83,7 +83,7 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 │   └── infer/                 闭环推理、HDF5 回放、LeRobot 示范回放、消融
 ├── orcastudio/                OrcaStudio 场景「pi」（自建，整目录交付）
 │   ├── levels/pi/pi.prefab         level 文件，把 `pi` 整个文件夹拖入项目 `levels/` 即可打开
-│   └── assets/importer/            场景全部资产（G1 网格 42 + 桌面/盒子/方块 50，共 92 个文件）
+│   └── assets/importer/            模型源文件 45 个（g1_pick/meshes 42 + 3 个场景 usda）
 ├── configs/train_g1_pick_cube.sh       训练启动脚本（v6）
 └── checkpoints/
     ├── norm_stats.json              v6 归一化统计（与数据集内同一份）
@@ -132,8 +132,19 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 
 **第二步：放模型文件（只在新电脑 / 新项目时需要）**
 
-`pi.prefab` 里没有模型，只存了路径和资产 ID。模型全在 `orcastudio/assets/importer/` 下，
-共 92 个文件，**整个目录原样复制**：
+`pi.prefab` 里没有模型，只存路径和资产 ID。模型源文件一共 45 个，按文件夹放在
+`orcastudio/assets/importer/` 下：
+
+```
+importer/
+├── g1_pick/
+│   └── meshes/            42 个（G1 每个连杆一个 .stl/.obj）
+├── table_only.usda        桌面
+├── box_container.usda     盒子
+└── red_cube_5cm.usda      方块
+```
+
+把这个 `importer` 目录整个拷到项目里：
 
 ```bash
 # PROJ = 放着 levels/ 和 assets/ 的那一层目录
@@ -141,29 +152,18 @@ PROJ="<OrcaStudio 项目根>"
 cp -r orcastudio/assets/importer/* "$PROJ/assets/importer/"
 ```
 
-| 内容 | 文件 | 数量 |
-|---|---|---|
-| G1 机器人 | `g1_pick/meshes/*.stl`、`*.obj` | 42 |
-| 桌面 | `table_only.usda` 及其导入产物 `table_only_*` | 17 |
-| 盒子 | `box_container.usda` + `box_container_*` + `default_box_container_*.usda.azmodel` | 21 |
-| 红色方块 | `red_cube_5cm.usda` 及其导入产物 `red_cube_5cm_*` | 12 |
+OrcaStudio 打开项目时会自动导入这 3 个 usda 和网格，在 `Cache/<平台>/assets/importer/`
+下生成 `.azmodel / .azlod / .azbuffer / .azmaterial / .procprefab` 缓存文件
+（自动生成，仓库里不放，也不用手动复制）。等导入跑完再打开 `pi` level。
 
-为什么第一眼只看到 G1 和盒子带路径：prefab 里 G1 的网格、盒子的网格写的是文件路径
-（`assets/importer/...`），而桌面和方块的网格组件只存了资产 ID（GUID，没有路径文字），
-所以**不能只挑带路径的文件复制**，必须整目录放。那 3 个 `.usda` 是桌面/盒子/方块的源文件，
-OrcaStudio 启动时自动导入；GUID 由文件路径决定，路径不变就能和 prefab 对上。
-
-复制完按下面 4 条确认（依次输出 `42`、`17`、`21`、`12`）：
+确认（输出 `42`）：
 
 ```bash
 ls "$PROJ/assets/importer/g1_pick/meshes" | wc -l
-ls "$PROJ/assets/importer"/table_only* | wc -l
-ls "$PROJ/assets/importer"/box_container* "$PROJ/assets/importer"/default_box_container* | wc -l
-ls "$PROJ/assets/importer"/red_cube_5cm* | wc -l
 ```
 
-少文件不会报错，只是对应零件变成白色占位块（机器人缺零件、盒子缺一面），
-物理和脚本仍然正常。已在本机跑过的不需要重复做，先跑上面的命令确认即可。
+如果打开后桌面/盒子/方块显示成白色方块，说明导入还没跑完：在 OrcaStudio 资产浏览器里
+找到 `table_only.usda`、`box_container.usda`、`red_cube_5cm.usda`，右键重新导入，再重开 level。
 
 **场景内的名字**：实体 `g1_pick_usda`、`box_container_usda`、`table_only_usda`、
 `red_cube_5cm_usda`；相机 `Camera`（第三人称全局）、`camera_right`（右腕）。
