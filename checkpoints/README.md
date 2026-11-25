@@ -1,52 +1,55 @@
-# 权重
+# 权重部署
 
-## 包含内容
+权重文件体积超过 GitHub 单文件限制（100 MB），不随仓库分发，需单独获取（随附 `MD5SUMS`，
+部署后执行 `md5sum -c MD5SUMS` 校验）。
 
-| 文件 | 说明 |
-|---|---|
-| `15000/` | 第 15000 步 checkpoint，5.4GB，54 个文件 |
-| `19999/` | 第 19999 步 checkpoint，5.4GB，54 个文件 |
-| `norm_stats.json` | 训练时使用的归一化统计（从 `lerobot_g1_pick/` 复制） |
-| `MD5SUMS` | 全部文件的校验清单，用于核对 U 盘拷贝完整性 |
+本仓库涉及三份权重，用途不同：
 
-每个 checkpoint 目录结构：
+| 权重 | 用途 | 部署路径 |
+|---|---|---|
+| v2 `1999/` | **v6 训练的初始化权重**（50 集基线，训练 20000 步） | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/` |
+| v6 `1999/` | **推理与评估用**（README 第 1 节成绩单所用） | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999/` |
+| pi0.5 base | v2 训练的初始化权重（官方发布，非本项目产物） | 按官方 openpi 文档下载 |
 
-```
-15000/
-├── _CHECKPOINT_METADATA
-├── assets/          空目录（本站训练未写入）
-├── params/          Orbax 参数树，5.1GB，推理必需
-└── train_state/     优化器状态，300MB，仅续训需要
-```
-
-注意：`assets/` 是空的，所以归一化统计不在 checkpoint 里，必须使用本目录附带的 `norm_stats.json`。
-
-## 部署位置
-
-解压后放到 openpi 的标准路径：
+## 每个 checkpoint 目录的结构
 
 ```
-$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora/15000
-$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora/19999
+1999/
+├── params/           54 个文件，约 5.1 GB —— 推理必需
+├── train_state/      续训必需（含优化器状态与步数）
+└── assets/           空；归一化统计用本仓库 checkpoints/norm_stats.json
 ```
 
-## 完整性校验
+## 部署命令
 
 ```bash
-cd <权重根目录>
+OPENPI_ROOT=/home/user/openpi
+
+# v6 训练起点
+mkdir -p $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified
+cp -r 1999_v2 $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999
+
+# v6 推理权重
+mkdir -p $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified
+cp -r 1999_v6 $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999
+
 md5sum -c MD5SUMS
-# 应全部输出 OK，共 54 行
 ```
 
-## 启动推理服务
+三个要点：
 
-```bash
-cd $OPENPI_ROOT
-OPENPI_POLICY_SEED=3 CUDA_VISIBLE_DEVICES=0 \
-XLA_PYTHON_CLIENT_PREALLOCATE=false \
-.venv/bin/python scripts/serve_policy.py policy:checkpoint \
-  --policy.config pi05_g1_pick_cube_lora \
-  --policy.dir $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora/g1_pick_cube_lora/15000
-```
+1. **路径必须带两层同名目录**（`配置名/实验名/`），少一层 `serve_policy.py` 找不到 checkpoint。
+2. 只做推理时 `train_state/` 可以不给，但 `params/` 必须完整（54 个文件）。
+3. 归一化统计与 checkpoint 绑定：v2 权重配 50 集版本的 norm_stats，v6 权重配本仓库
+   `checkpoints/norm_stats.json`（60 集）。混用会直接导致动作尺度错误。
 
-`OPENPI_POLICY_SEED` 决定流匹配采样的噪声起点，同一 seed 下动作可复现；实测 seed 3 在开环 rollout 中完整成功。
+## norm_stats.json
+
+`checkpoints/norm_stats.json` 是 60 集 v6 数据集的归一化分位数，与
+`dataset/lerobot_g1_pick_v6/norm_stats.json` 为同一份。关键值：
+
+| 字段 | q01 | q99 |
+|---|---|---|
+| actions[7]（夹爪左指） | −0.02072 | +0.00518 |
+| actions[8]（夹爪右指） | −0.02072 | +0.00518 |
+| state[7..8] | −0.02044 / −0.02052 | +0.00518 / +0.00473 |

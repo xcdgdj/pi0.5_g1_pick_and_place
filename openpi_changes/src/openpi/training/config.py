@@ -92,6 +92,9 @@ class DataConfig:
     # If true, will use the LeRobot dataset task to define the prompt.
     prompt_from_task: bool = False
 
+    # 按 episode 的帧级采样权重（LeRobot 数据集），None 表示按帧均匀采样。
+    episode_sampling_weights: dict[int, float] | None = None
+
     # Only used for RLDS data loader (ie currently only used for DROID).
     rlds_data_dir: str | None = None
     # Action space for DROID dataset.
@@ -1178,6 +1181,245 @@ _CONFIGS = [
         save_interval=1_000,
         # 每 1000 步的存档全部保留，方便随时取一档测试
         keep_period=1_000,
+        wandb_enabled=False,
+    ),
+    # ========== 同上，但从 19999 权重初始化做 DAgger 短轮微调 ==========
+    # 与 pi05_g1_pick_cube_lora 的区别只有三处：
+    #   1) weight_loader 指向已训好的 19999/params（只加载参数，见 weight_loaders.py），
+    #      优化器状态/步数是全新的 0，不是 --resume 那种完整续训；
+    #   2) 数据集换成「旧示范 + Pico 接管后段」的 v2；
+    #   3) 步数短、LR 低、存盘密，便于按闭环成功率逐档挑 checkpoint。
+    TrainConfig(
+        name="pi05_g1_pick_cube_lora_v2",
+        model=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            action_dim=32,
+            action_horizon=50,
+            freeze_vision_encoder=True,
+        ),
+        data=LeRobotG1PickCubeDataConfig(
+            # 换机器/换数据集时改这里；v2 = 旧 45 集 + 新接管后段
+            repo_id="/home/user/pi/lerobot_g1_pick_v2",
+            base_config=DataConfig(prompt_from_task=True),
+        ),
+        # 指向训练产出的 params 目录（不是 step 目录本身）
+        weight_loader=weight_loaders.CheckpointWeightLoader(
+            "/home/user/pi/weights/19999/params"
+        ),
+        freeze_filter=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            freeze_vision_encoder=True,
+        ).get_freeze_filter(),
+        ema_decay=None,
+        batch_size=4,
+        grad_accum_steps=4,
+        num_workers=8,
+        # 已在收敛点附近，LR 比从 base 训时低一个档：
+        # 峰值 2e-5、100 步预热、2000 步退到 2e-6
+        lr_schedule=_optimizer.CosineDecaySchedule(
+            warmup_steps=100,
+            peak_lr=2e-5,
+            decay_steps=2_000,
+            decay_lr=2e-6,
+        ),
+        optimizer=_optimizer.AdamW(weight_decay=1e-4, clip_gradient_norm=1.0),
+        num_train_steps=2_000,
+        log_interval=20,
+        # 每 250 步存一档（共 8 档），闭环挑最优
+        save_interval=250,
+        keep_period=250,
+        wandb_enabled=False,
+    ),
+    # ========== v3：v2 的 50 集 + 3 条 Pico 纠正示范（远时保持张开继续接近） ==========
+    TrainConfig(
+        name="pi05_g1_pick_cube_lora_v3",
+        model=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            action_dim=32,
+            action_horizon=50,
+            freeze_vision_encoder=True,
+        ),
+        data=LeRobotG1PickCubeDataConfig(
+            repo_id="/home/user/pi/lerobot_g1_pick_v3",
+            base_config=DataConfig(prompt_from_task=True),
+        ),
+        # 从 v2 的 1999 存档继续（只加载参数，优化器状态全新）
+        weight_loader=weight_loaders.CheckpointWeightLoader(
+            "/home/user/openpi/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params"
+        ),
+        freeze_filter=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            freeze_vision_encoder=True,
+        ).get_freeze_filter(),
+        ema_decay=None,
+        batch_size=4,
+        grad_accum_steps=4,
+        num_workers=8,
+        lr_schedule=_optimizer.CosineDecaySchedule(
+            warmup_steps=100,
+            peak_lr=2e-5,
+            decay_steps=2_000,
+            decay_lr=2e-6,
+        ),
+        optimizer=_optimizer.AdamW(weight_decay=1e-4, clip_gradient_norm=1.0),
+        num_train_steps=2_000,
+        log_interval=20,
+        save_interval=250,
+        keep_period=250,
+        wandb_enabled=False,
+    ),
+    # ========== v4：v3 的 53 集 + 3 条近距离纠正示范（合爪前对准） ==========
+    TrainConfig(
+        name="pi05_g1_pick_cube_lora_v4",
+        model=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            action_dim=32,
+            action_horizon=50,
+            freeze_vision_encoder=True,
+        ),
+        data=LeRobotG1PickCubeDataConfig(
+            repo_id="/home/user/pi/lerobot_g1_pick_v4",
+            base_config=DataConfig(
+                prompt_from_task=True,
+                # ep 50-52：第一批 DAgger；ep 53-55：第二批近距离纠正示范
+                episode_sampling_weights={50: 3.0, 51: 3.0, 52: 3.0, 53: 3.0, 54: 3.0, 55: 3.0},
+            ),
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader(
+            "/home/user/openpi/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params"
+        ),
+        freeze_filter=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            freeze_vision_encoder=True,
+        ).get_freeze_filter(),
+        ema_decay=None,
+        batch_size=4,
+        grad_accum_steps=4,
+        num_workers=8,
+        lr_schedule=_optimizer.CosineDecaySchedule(
+            warmup_steps=100,
+            peak_lr=2e-5,
+            decay_steps=2_000,
+            decay_lr=2e-6,
+        ),
+        optimizer=_optimizer.AdamW(weight_decay=1e-4, clip_gradient_norm=1.0),
+        num_train_steps=2_000,
+        log_interval=20,
+        save_interval=250,
+        keep_period=250,
+        wandb_enabled=False,
+    ),
+    # ========== v5：v4 的 56 集 + 3 条第三批示范（停滞接管 2 条 + 搬运放置 1 条） ==========
+    TrainConfig(
+        name="pi05_g1_pick_cube_lora_v5",
+        model=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            action_dim=32,
+            action_horizon=50,
+            freeze_vision_encoder=True,
+        ),
+        data=LeRobotG1PickCubeDataConfig(
+            repo_id="/home/user/pi/lerobot_g1_pick_v5",
+            base_config=DataConfig(
+                prompt_from_task=True,
+                # ep 50-52：第一批 DAgger；53-55：第二批近距离纠正；
+                # 56/58：停滞接管（s1/s6）；57：夹持搬运放置（s5，边界成功例）
+                episode_sampling_weights={
+                    50: 3.0, 51: 3.0, 52: 3.0,
+                    53: 3.0, 54: 3.0, 55: 3.0,
+                    56: 3.0, 57: 3.0, 58: 3.0,
+                },
+            ),
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader(
+            "/home/user/openpi/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params"
+        ),
+        freeze_filter=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            freeze_vision_encoder=True,
+        ).get_freeze_filter(),
+        ema_decay=None,
+        batch_size=4,
+        grad_accum_steps=4,
+        num_workers=8,
+        lr_schedule=_optimizer.CosineDecaySchedule(
+            warmup_steps=100,
+            peak_lr=2e-5,
+            decay_steps=2_000,
+            decay_lr=2e-6,
+        ),
+        optimizer=_optimizer.AdamW(weight_decay=1e-4, clip_gradient_norm=1.0),
+        num_train_steps=2_000,
+        log_interval=20,
+        save_interval=250,
+        keep_period=250,
+        wandb_enabled=False,
+    ),
+    # ========== v6：v5 的 59 集 + 1 条偏心但全开松爪的成功放置示范 ==========
+    TrainConfig(
+        name="pi05_g1_pick_cube_lora_v6",
+        model=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            action_dim=32,
+            action_horizon=50,
+            freeze_vision_encoder=True,
+        ),
+        data=LeRobotG1PickCubeDataConfig(
+            repo_id="/home/user/pi/lerobot_g1_pick_v6",
+            base_config=DataConfig(
+                prompt_from_task=True,
+                # ep 50-52：第一批 DAgger；53-55：第二批近距离纠正；
+                # 56/58：停滞接管（s1/s6）；57：搬运放置（边界例，8.0cm）；
+                # 59：全开松爪放置（5.6cm 偏心成功例）
+                episode_sampling_weights={
+                    50: 3.0, 51: 3.0, 52: 3.0,
+                    53: 3.0, 54: 3.0, 55: 3.0,
+                    56: 3.0, 57: 3.0, 58: 3.0, 59: 3.0,
+                },
+            ),
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader(
+            "/home/user/openpi/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/params"
+        ),
+        freeze_filter=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            freeze_vision_encoder=True,
+        ).get_freeze_filter(),
+        ema_decay=None,
+        batch_size=4,
+        grad_accum_steps=4,
+        num_workers=8,
+        lr_schedule=_optimizer.CosineDecaySchedule(
+            warmup_steps=100,
+            peak_lr=2e-5,
+            decay_steps=2_000,
+            decay_lr=2e-6,
+        ),
+        optimizer=_optimizer.AdamW(weight_decay=1e-4, clip_gradient_norm=1.0),
+        num_train_steps=2_000,
+        log_interval=20,
+        save_interval=250,
+        keep_period=250,
         wandb_enabled=False,
     ),
     # RoboArena & PolaRiS configs.

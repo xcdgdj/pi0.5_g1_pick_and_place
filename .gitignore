@@ -1,6 +1,20 @@
-__pycache__/
-*.pyc
-*.log
-.DS_Store
+# 权重本体单独分发（体积超 GitHub 限制），只保留说明与归一化统计
 checkpoints/*/
 !checkpoints/README.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# 日志与临时产物
+*.log
+MUJOCO_LOG.TXT
+wandb/
+.tmp/
+*.tar.gz
+
+# 系统文件
+.DS_Store
+Thumbs.db

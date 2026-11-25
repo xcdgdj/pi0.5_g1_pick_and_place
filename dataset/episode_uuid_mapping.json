@@ -1,0 +1,577 @@
+[
+  {
+    "episode_index": 0,
+    "uuid": null,
+    "hdf5_start_row": null,
+    "hdf5_total_rows": null,
+    "lerobot_frames": 369,
+    "match_err_rad": null,
+    "match": "ambiguous",
+    "note": "源目录已被后续采集覆盖；首帧为初始姿态，属同起点短集之一"
+  },
+  {
+    "episode_index": 1,
+    "uuid": "1",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2439,
+    "lerobot_frames": 366,
+    "match_err_rad": 6.32e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 2,
+    "uuid": "11",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2072,
+    "lerobot_frames": 311,
+    "match_err_rad": 7.103e-05,
+    "match": "exact"
+  },
+  {
+    "episode_index": 3,
+    "uuid": "12",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1855,
+    "lerobot_frames": 278,
+    "match_err_rad": 1.44e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 4,
+    "uuid": "13",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2011,
+    "lerobot_frames": 301,
+    "match_err_rad": 1.491e-05,
+    "match": "exact"
+  },
+  {
+    "episode_index": 5,
+    "uuid": "14",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1993,
+    "lerobot_frames": 299,
+    "match_err_rad": 1.58e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 6,
+    "uuid": "15",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1801,
+    "lerobot_frames": 270,
+    "match_err_rad": 3.82e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 7,
+    "uuid": "16",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2095,
+    "lerobot_frames": 314,
+    "match_err_rad": 7.1e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 8,
+    "uuid": "17",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1835,
+    "lerobot_frames": 275,
+    "match_err_rad": 2.6e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 9,
+    "uuid": "18",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2098,
+    "lerobot_frames": 315,
+    "match_err_rad": 1e-08,
+    "match": "exact"
+  },
+  {
+    "episode_index": 10,
+    "uuid": "19",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2065,
+    "lerobot_frames": 310,
+    "match_err_rad": 2.93e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 11,
+    "uuid": null,
+    "hdf5_start_row": null,
+    "hdf5_total_rows": null,
+    "lerobot_frames": 120,
+    "match_err_rad": null,
+    "match": "ambiguous",
+    "note": "源目录已被后续采集覆盖；首帧为初始姿态，属同起点短集之一"
+  },
+  {
+    "episode_index": 12,
+    "uuid": "2",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1948,
+    "lerobot_frames": 292,
+    "match_err_rad": 3.29e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 13,
+    "uuid": "21",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1958,
+    "lerobot_frames": 294,
+    "match_err_rad": 2e-08,
+    "match": "exact"
+  },
+  {
+    "episode_index": 14,
+    "uuid": "22",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1785,
+    "lerobot_frames": 268,
+    "match_err_rad": 2e-08,
+    "match": "exact"
+  },
+  {
+    "episode_index": 15,
+    "uuid": "23",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1775,
+    "lerobot_frames": 266,
+    "match_err_rad": 8e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 16,
+    "uuid": "24",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1891,
+    "lerobot_frames": 283,
+    "match_err_rad": 4.6e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 17,
+    "uuid": "25",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1951,
+    "lerobot_frames": 292,
+    "match_err_rad": 1.36e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 18,
+    "uuid": "26",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1923,
+    "lerobot_frames": 288,
+    "match_err_rad": 1.08e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 19,
+    "uuid": "27",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1881,
+    "lerobot_frames": 282,
+    "match_err_rad": 5e-08,
+    "match": "exact"
+  },
+  {
+    "episode_index": 20,
+    "uuid": "28",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1817,
+    "lerobot_frames": 272,
+    "match_err_rad": 3e-08,
+    "match": "exact"
+  },
+  {
+    "episode_index": 21,
+    "uuid": "29",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2146,
+    "lerobot_frames": 322,
+    "match_err_rad": 2.6e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 22,
+    "uuid": "3",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2674,
+    "lerobot_frames": 401,
+    "match_err_rad": 7e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 23,
+    "uuid": "30",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1858,
+    "lerobot_frames": 279,
+    "match_err_rad": 1.4e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 24,
+    "uuid": "31",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1980,
+    "lerobot_frames": 297,
+    "match_err_rad": 8e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 25,
+    "uuid": "32",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1795,
+    "lerobot_frames": 269,
+    "match_err_rad": 1e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 26,
+    "uuid": "34",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2074,
+    "lerobot_frames": 311,
+    "match_err_rad": 7.1e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 27,
+    "uuid": "35",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1845,
+    "lerobot_frames": 277,
+    "match_err_rad": 4.1e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 28,
+    "uuid": "36",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2049,
+    "lerobot_frames": 307,
+    "match_err_rad": 4.45e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 29,
+    "uuid": "37",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2130,
+    "lerobot_frames": 319,
+    "match_err_rad": 2e-08,
+    "match": "exact"
+  },
+  {
+    "episode_index": 30,
+    "uuid": "38",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2021,
+    "lerobot_frames": 303,
+    "match_err_rad": 2e-08,
+    "match": "exact"
+  },
+  {
+    "episode_index": 31,
+    "uuid": "39",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1773,
+    "lerobot_frames": 266,
+    "match_err_rad": 2.87e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 32,
+    "uuid": "4",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2233,
+    "lerobot_frames": 335,
+    "match_err_rad": 2e-08,
+    "match": "exact"
+  },
+  {
+    "episode_index": 33,
+    "uuid": "40",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1813,
+    "lerobot_frames": 272,
+    "match_err_rad": 2e-08,
+    "match": "exact"
+  },
+  {
+    "episode_index": 34,
+    "uuid": "41",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1933,
+    "lerobot_frames": 290,
+    "match_err_rad": 3e-08,
+    "match": "exact"
+  },
+  {
+    "episode_index": 35,
+    "uuid": "43",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1967,
+    "lerobot_frames": 295,
+    "match_err_rad": 4.7e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 36,
+    "uuid": "44",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1992,
+    "lerobot_frames": 299,
+    "match_err_rad": 3.8e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 37,
+    "uuid": "45",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1985,
+    "lerobot_frames": 298,
+    "match_err_rad": 2.5e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 38,
+    "uuid": "46",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2108,
+    "lerobot_frames": 316,
+    "match_err_rad": 7.4e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 39,
+    "uuid": "48",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2161,
+    "lerobot_frames": 324,
+    "match_err_rad": 1.64e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 40,
+    "uuid": "49",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2077,
+    "lerobot_frames": 311,
+    "match_err_rad": 4.8e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 41,
+    "uuid": "5",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2101,
+    "lerobot_frames": 315,
+    "match_err_rad": 9.2e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 42,
+    "uuid": "50",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1956,
+    "lerobot_frames": 293,
+    "match_err_rad": 2.79e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 43,
+    "uuid": "6",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1978,
+    "lerobot_frames": 297,
+    "match_err_rad": 5e-08,
+    "match": "exact"
+  },
+  {
+    "episode_index": 44,
+    "uuid": "7",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2002,
+    "lerobot_frames": 300,
+    "match_err_rad": 1.1e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 45,
+    "uuid": "8",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 2112,
+    "lerobot_frames": 317,
+    "match_err_rad": 7.7e-07,
+    "match": "exact"
+  },
+  {
+    "episode_index": 46,
+    "uuid": "9",
+    "hdf5_start_row": 1,
+    "hdf5_total_rows": 1969,
+    "lerobot_frames": 295,
+    "match_err_rad": 6.03e-06,
+    "match": "exact"
+  },
+  {
+    "episode_index": 47,
+    "uuid": null,
+    "hdf5_start_row": null,
+    "hdf5_total_rows": null,
+    "lerobot_frames": 133,
+    "match_err_rad": null,
+    "match": "ambiguous",
+    "note": "源目录已被后续采集覆盖；首帧为初始姿态，属同起点短集之一"
+  },
+  {
+    "episode_index": 48,
+    "uuid": null,
+    "hdf5_start_row": null,
+    "hdf5_total_rows": null,
+    "lerobot_frames": 144,
+    "match_err_rad": null,
+    "match": "ambiguous",
+    "note": "源目录已被后续采集覆盖；首帧为初始姿态，属同起点短集之一"
+  },
+  {
+    "episode_index": 49,
+    "uuid": null,
+    "hdf5_start_row": null,
+    "hdf5_total_rows": null,
+    "lerobot_frames": 220,
+    "match_err_rad": null,
+    "match": "ambiguous",
+    "note": "源目录已被后续采集覆盖；首帧为初始姿态，属同起点短集之一"
+  },
+  {
+    "episode_index": 50,
+    "uuid": "1233e52c-fc9b-494b-848d-67034dd8dd1a",
+    "hdf5_start_row": 751,
+    "takeover_row": 750,
+    "hdf5_total_rows": 1866,
+    "lerobot_frames": 167,
+    "est_frames_from_rows": 167.4,
+    "frame_err": 0.4,
+    "match_err_rad": 0.01791553,
+    "match": "exact"
+  },
+  {
+    "episode_index": 51,
+    "uuid": "f94ca361-4983-496d-b6d0-bf64d5c855db",
+    "hdf5_start_row": 751,
+    "takeover_row": 750,
+    "hdf5_total_rows": 2070,
+    "lerobot_frames": 198,
+    "est_frames_from_rows": 198.0,
+    "frame_err": 0.0,
+    "match_err_rad": 0.01803961,
+    "match": "exact"
+  },
+  {
+    "episode_index": 52,
+    "uuid": "fbb84e10-2b45-448e-8a04-49d329578484",
+    "hdf5_start_row": 601,
+    "takeover_row": 600,
+    "hdf5_total_rows": 3131,
+    "lerobot_frames": 380,
+    "est_frames_from_rows": 379.6,
+    "frame_err": 0.4,
+    "match_err_rad": 0.01781213,
+    "match": "exact"
+  },
+  {
+    "episode_index": 53,
+    "uuid": "33df4239-a26c-4410-9cec-241c73ee6098",
+    "hdf5_start_row": 751,
+    "takeover_row": 750,
+    "hdf5_total_rows": 2710,
+    "lerobot_frames": 294,
+    "est_frames_from_rows": 294.0,
+    "frame_err": 0.0,
+    "match_err_rad": 0.01771551,
+    "match": "exact"
+  },
+  {
+    "episode_index": 54,
+    "uuid": "4f534215-b009-4311-9254-621700bc1284",
+    "hdf5_start_row": 751,
+    "takeover_row": 750,
+    "hdf5_total_rows": 2049,
+    "lerobot_frames": 195,
+    "est_frames_from_rows": 194.8,
+    "frame_err": 0.2,
+    "match_err_rad": 0.01558943,
+    "match": "exact"
+  },
+  {
+    "episode_index": 55,
+    "uuid": "ed09d9b8-f7b5-4c7c-bf52-71da0e8e4e68",
+    "hdf5_start_row": 751,
+    "takeover_row": 750,
+    "hdf5_total_rows": 3093,
+    "lerobot_frames": 351,
+    "est_frames_from_rows": 351.4,
+    "frame_err": 0.4,
+    "match_err_rad": 0.01617128,
+    "match": "exact"
+  },
+  {
+    "episode_index": 56,
+    "uuid": "86d3d433-3cbe-442e-a7a2-28c456b31bbd",
+    "hdf5_start_row": 751,
+    "takeover_row": 750,
+    "hdf5_total_rows": 2609,
+    "lerobot_frames": 279,
+    "est_frames_from_rows": 278.9,
+    "frame_err": 0.1,
+    "match_err_rad": 0.01692092,
+    "match": "exact"
+  },
+  {
+    "episode_index": 57,
+    "uuid": "7a353665-0043-4c8a-9b03-2ee4e485eda4",
+    "hdf5_start_row": 750,
+    "takeover_row": 750,
+    "hdf5_total_rows": 2422,
+    "lerobot_frames": 251,
+    "est_frames_from_rows": 250.8,
+    "frame_err": 0.2,
+    "match_err_rad": 0.00807124,
+    "match": "exact"
+  },
+  {
+    "episode_index": 58,
+    "uuid": "698fc3ea-df21-450c-9447-50c827b7bc3b",
+    "hdf5_start_row": 751,
+    "takeover_row": 750,
+    "hdf5_total_rows": 2588,
+    "lerobot_frames": 276,
+    "est_frames_from_rows": 275.7,
+    "frame_err": 0.3,
+    "match_err_rad": 0.01935792,
+    "match": "exact"
+  },
+  {
+    "episode_index": 59,
+    "uuid": "54d5a512-1644-4b9c-accd-88b6bf874fc8",
+    "hdf5_start_row": 750,
+    "takeover_row": 750,
+    "hdf5_total_rows": 2376,
+    "lerobot_frames": 244,
+    "est_frames_from_rows": 243.9,
+    "frame_err": 0.1,
+    "match_err_rad": 0.00811934,
+    "match": "exact"
+  }
+]

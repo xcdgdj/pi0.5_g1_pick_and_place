@@ -66,6 +66,16 @@ VIDEO_SOURCES = {
 
 DEFAULT_TASK = "Pick up the red cube and place it in the box."
 
+# G1 DEX1 夹爪位置阻抗参数（conf/g1_dex1_osc_conf.py 的 gripper_r）：
+#   tau = kp*(q_d - q) - kd*dq ，据此从记录的电机力反解控制目标 q_d
+GRIP_KP = 1500.0
+GRIP_KD = 15.0
+GRIP_Q_OPEN = -0.020
+GRIP_Q_CLOSE = 0.0245
+# 采集时 dataset<->sim 夹爪映射用的归一化分位（lerobot_g1_pick/norm_stats.json）
+GRIP_Q01 = -0.02072
+GRIP_Q99 = 0.00519
+
 # 双臂数据里右臂/左臂的切片位置：
 #   joint   (N, 14) = [左臂 7 | 右臂 7]
 #   gripper (N,  4) = [左夹爪 2 | 右夹爪 2]
@@ -126,22 +136,56 @@ def probe_video(path: Path) -> tuple[int, float]:
     return frames, fps
 
 
-def resample_video(src: Path, dst: Path, n_frames: int) -> None:
+def probe_video_duration(path: Path) -> float:
+    """读取视频容器的精确时长（秒）。VFR 源下比 frames/fps 更接近真实时长。"""
+    proc = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "v:0",
+         "-show_entries", "format=duration", "-of", "csv=p=0", str(path)],
+        capture_output=True, text=True,
+    )
+    if proc.returncode == 0:
+        try:
+            d = float(proc.stdout.strip())
+            if d > 0:
+                return d
+        except ValueError:
+            pass
+    frames, fps = probe_video(path)
+    return frames / fps
+
+
+def resample_video(
+    src: Path,
+    dst: Path,
+    n_frames: int,
+    start_sec: float = 0.0,
+    pts_scale: float = 1.0,
+) -> None:
     """把源视频重采样成固定 30fps、固定帧数、224x224 的 H.264。
 
-    - `fps=30` 按时间轴均匀重采样（丢帧/补帧），避免时间漂移；
+    - `setpts=(PTS-STARTPTS)*pts_scale` 先把视频时间轴拉伸/压缩到仿真时间轴
+      （pts_scale = 目标时长 / 源时长），消除视频与动作之间的系统性时长漂移；
+    - `fps=30` 在拉伸后的时间轴上均匀重采样（丢帧/补帧）；
     - `scale+pad` 等比缩放到 224x224 并上下补黑边（640x480 → 224x168 → 224x224），
       与 OpenPI 训练端 resize_with_pad 的行为一致，推理端无需再缩放；
     - `-frames:v` 截断到统一长度，使两路视频与 parquet 行数严格一致；
-    - yuv420p 是 LeRobot / decord 解码的必要像素格式。
+    - yuv420p 是 LeRobot / decord 解码的必要像素格式；
+    - `start_sec` > 0 时从该时刻开始截取（DAgger 数据裁掉模型段用），
+      放在 `-i` 之后是精确 seek；`(PTS-STARTPTS)` 把起点归零。
     """
     dst.parent.mkdir(parents=True, exist_ok=True)
+    seek = ["-ss", f"{start_sec:.6f}"] if start_sec > 0 else []
     run_ffmpeg([
         "-i", str(src),
+        *seek,
         "-vf", (
+            f"setpts=(PTS-STARTPTS)*{pts_scale:.9f},"
             f"fps={FPS_OUT},"
             f"scale={IMG_W}:{IMG_H}:force_original_aspect_ratio=decrease,"
-            f"pad={IMG_W}:{IMG_H}:(ow-iw)/2:(oh-ih)/2"
+            f"pad={IMG_W}:{IMG_H}:(ow-iw)/2:(oh-ih)/2,"
+            # VFR 源经 seek/重采样后尾部可能差 1~4 帧，克隆末帧补齐，
+            # 保证输出帧数与 parquet 行数严格一致
+            f"tpad=stop_mode=clone:stop_duration=0.5"
         ),
         "-frames:v", str(n_frames),
         "-c:v", "libx264",
@@ -173,6 +217,20 @@ def interp_to_timestamps(t_src: np.ndarray, x_src: np.ndarray, t_dst: np.ndarray
     for d in range(x_src.shape[1]):
         out[:, d] = np.interp(t_dst, t_src, x_src[:, d])
     return out
+
+
+def gripper_cmd_from_force(q: np.ndarray, tau: np.ndarray, t: np.ndarray) -> np.ndarray:
+    """由记录的夹爪位置/电机力反解控制目标，并映射到数据集量纲。
+
+    阻抗律 tau = kp*(q_d - q) - kd*dq  =>  q_d = q + (tau + kd*dq)/kp
+    dq 用实测 qpos 对仿真时间作数值微分得到；q_d 钳到 [open, close]，
+    再按采集时的 q01/q99 线性映射回数据集量纲（与训练侧一致）。
+    """
+    dq = np.gradient(q, t)
+    q_d = q + (tau + GRIP_KD * dq) / GRIP_KP
+    q_d = np.clip(q_d, GRIP_Q_OPEN, GRIP_Q_CLOSE)
+    a = (q_d - GRIP_Q_OPEN) / (GRIP_Q_CLOSE - GRIP_Q_OPEN)
+    return GRIP_Q01 + a * (GRIP_Q99 - GRIP_Q01)
 
 
 def image_stats(video_path: Path) -> dict:
@@ -252,6 +310,11 @@ def read_episode(ep_dir: Path, arm: str = "right") -> dict:
         joint = np.asarray(f[k["joint"]][:], dtype=np.float64)      # (N, J)
         grip = np.asarray(f[k["gripper"]][:], dtype=np.float64)     # (N, G)
         t = np.asarray(f["time_step"][:], dtype=np.float64)         # (N,)
+        # 夹爪电机出力（+夹持 / -张开），用于定位松爪指令切换行
+        motor = (
+            np.asarray(f["action/effector/motor"][:], dtype=np.float64)
+            if "action/effector/motor" in f else None
+        )
         task = None
         if "task_description" in f.attrs:
             task = f.attrs["task_description"]
@@ -266,10 +329,18 @@ def read_episode(ep_dir: Path, arm: str = "right") -> dict:
         raise RuntimeError(f"{h5_path} 维度异常: joint={joint.shape}, gripper={grip.shape}")
 
     # 按 --arm 抽单臂：只有数据确实是双臂维度时才切，单臂数据原样使用
+    eff_raw = grip  # 保留未切片的夹爪原始 qpos，反解指令时按右夹爪 joint1 取值
     j_slice, g_slice = ARM_SLICES[arm]
     if arm != "none" and joint.shape[1] >= 14 and grip.shape[1] >= 4:
         joint = joint[:, j_slice]
         grip = grip[:, g_slice]
+
+    # DAgger 采集脚本会写 record/dagger.json 标出接管点，
+    # --trim-takeover 时从该行裁掉模型段，只保留人的专家段
+    takeover_row = None
+    dagger_json = record_dir / "dagger.json"
+    if dagger_json.is_file():
+        takeover_row = int(json.loads(dagger_json.read_text()).get("takeover_row") or 0) or None
 
     return {
         "h5_path": h5_path,
@@ -278,6 +349,9 @@ def read_episode(ep_dir: Path, arm: str = "right") -> dict:
         "dim": joint.shape[1] + grip.shape[1],
         "task": str(task),
         "video_dir": ep_dir / "video",
+        "takeover_row": takeover_row,
+        "motor": motor,
+        "eff_raw": eff_raw,
     }
 
 
@@ -294,7 +368,17 @@ def discover_episodes(root: Path) -> list[Path]:
 
 # ────────────────────────────── 主转换流程 ──────────────────────────────
 
-def convert(dataset_root: Path, output: Path, overwrite: bool = False, arm: str = "right") -> None:
+def convert(
+    dataset_root: Path,
+    output: Path,
+    overwrite: bool = False,
+    arm: str = "right",
+    trim_takeover: bool = False,
+    gripper_cmd_hold: list[float] | None = None,
+    gripper_cmd_open: list[float] | None = None,
+    gripper_cmd_motor_col: int = 1,
+    gripper_action_from_force: bool = False,
+) -> None:
     episodes = discover_episodes(dataset_root)
 
     if output.exists() and any((output / d).exists() for d in ("data", "videos", "meta")):
@@ -327,44 +411,113 @@ def convert(dataset_root: Path, output: Path, overwrite: bool = False, arm: str 
                 f"维度不一致: 第 0 集 {dim} 维, {ep_dir.name} 为 {ep['dim']} 维"
             )
 
-        # ── 1. 时间轴对齐：以视频帧数为基准 ─────────────────────────────
-        base_src = video_dir / VIDEO_SOURCES["observation.images.base_0_rgb"]
-        right_src = video_dir / VIDEO_SOURCES["observation.images.right_wrist_0_rgb"]
-        for v in (base_src, right_src):
+        # ── 1. 时间轴对齐：以仿真时间为基准，视频拉伸到仿真时间轴 ───────
+        video_dur: dict[str, float] = {}
+        for key, filename in VIDEO_SOURCES.items():
+            v = video_dir / filename
             if not v.exists():
                 raise RuntimeError(f"缺少视频: {v}")
+            video_dur[key] = probe_video_duration(v)
 
-        base_frames, base_fps = probe_video(base_src)
-        right_frames, right_fps = probe_video(right_src)
-        # 以 30fps 重编码后，各路的帧数 = 源时长 × 30
-        m_base = int(round(base_frames / base_fps * FPS_OUT))
-        m_right = int(round(right_frames / right_fps * FPS_OUT))
-        # 取较短者，保证两路视频 + parquet 三者行数一致
-        M = min(m_base, m_right)
+        # 源时间轴（从 0 开始的相对仿真时间）
+        t_src = ep["time"] - ep["time"][0]
+        t_sim_total = float(t_src[-1])
+
+        # --trim-takeover：按仿真时间定位接管点，裁掉前面的模型段
+        start_sim = 0.0
+        start_row = 0
+        if trim_takeover and ep["takeover_row"]:
+            r = ep["takeover_row"]
+            if 0 < r < len(t_src):
+                start_sim = float(t_src[r])
+                start_row = r
+            else:
+                print(f"  [警告] {ep_dir.name} takeover_row={r} 越界，按整段处理")
+        rem_sim = t_sim_total - start_sim
+
+        # 输出行数按仿真时长决定（每行 1/30s 仿真时间）；弃用"以视频帧数为基准"，
+        # 避免视频 VFR 时长漂移把动作轴拉长 2%~4%。
+        M = int(round(rem_sim * FPS_OUT))
         if M <= 0:
-            raise RuntimeError(f"视频长度异常: base={m_base}, right={m_right}")
+            raise RuntimeError(
+                f"时长异常: T_sim={t_sim_total:.3f}s, start={start_sim:.3f}s"
+            )
 
-        # 视频时间轴（秒）：第 i 帧对应 i / 30
-        t_dst = np.arange(M, dtype=np.float64) / FPS_OUT
+        # 输出时间戳从 0 开始；查原始仿真时间轴时加上裁剪偏移
+        timestamp = np.arange(M, dtype=np.float64) / FPS_OUT
+        t_query = start_sim + timestamp
 
         # ── 2. 滤波 + 插值：200Hz → 30Hz ────────────────────────────────
-        t_src = ep["time"] - ep["time"][0]          # 从 0 开始的相对时间
         x_s = smoothing(ep["x"])                    # 滑动平均，压手抖
-        state = interp_to_timestamps(t_src, x_s, t_dst)     # (M, D)
-        # 按需求：action 与 state 使用同一组位置指令。
-        # 若要做"动作 = 下一步状态"，改为 np.roll(state, -1, axis=0) 即可。
+        state = interp_to_timestamps(t_src, x_s, t_query)   # (M, D)
+        # 手臂 action 与 state 同为实测位置（标准做法）。
         action = state.copy()
 
-        # ── 3. 视频落盘（两路）─────────────────────────────────────────
+        # ── 2b. 夹爪 action 改为控制指令（而非被方块挡住的实际 qpos）────
+        # 统一规则：由记录的电机力 + 实测位置逐帧反解阻抗控制目标。
+        # 同一夹持状态下，新旧数据得到同一套目标标签。
+        if gripper_action_from_force:
+            g_dim = dim - 7
+            gcols = list(range(dim - g_dim, dim))
+            eff_raw = ep.get("eff_raw")
+            motor = ep.get("motor")
+            if eff_raw is None or motor is None:
+                raise RuntimeError(f"{ep_dir.name}: 缺少 effector 位置/电机力，无法反解")
+            q_col = 2 if eff_raw.shape[1] >= 4 else 0   # 右夹爪 joint1
+            col = gripper_cmd_motor_col
+            if not (0 <= col < motor.shape[1]):
+                col = motor.shape[1] - 1
+            ds_dense = gripper_cmd_from_force(
+                eff_raw[:, q_col], motor[:, col], t_src
+            )
+            ds_30 = interp_to_timestamps(t_src, ds_dense[:, None], t_query)[:, 0]
+            for c in gcols:
+                action[:, c] = ds_30
+        # 兼容旧模式：保持/张开两个硬编码指令，按电机力符号切换
+        elif gripper_cmd_hold is not None and gripper_cmd_open is not None:
+            g_dim = len(gripper_cmd_hold)
+            if len(gripper_cmd_open) != g_dim or g_dim > dim:
+                raise RuntimeError(
+                    f"{ep_dir.name}: 夹爪指令维度不匹配 hold={g_dim} "
+                    f"open={len(gripper_cmd_open)} dim={dim}"
+                )
+            gcols = list(range(dim - g_dim, dim))
+            motor = ep.get("motor")
+            switch_sim = None
+            if motor is not None and motor.ndim == 2 and motor.shape[0] == len(t_src):
+                col = gripper_cmd_motor_col
+                if not (0 <= col < motor.shape[1]):
+                    col = motor.shape[1] - 1
+                sgn = np.sign(motor[:, col])
+                trans = np.where(np.diff(sgn) != 0)[0]
+                cand = [
+                    int(i) for i in trans
+                    if i >= start_row and sgn[i] > 0 and sgn[i + 1] < 0
+                ]
+                if cand:
+                    switch_sim = float(t_src[cand[0]])
+            if switch_sim is None:
+                raise RuntimeError(f"{ep_dir.name}: 未找到夹爪正→负切换行，无法写指令标签")
+            open_mask = t_query >= switch_sim
+            for j, c in enumerate(gcols):
+                action[:, c] = gripper_cmd_hold[j]
+                action[open_mask, c] = gripper_cmd_open[j]
+
+        # ── 3. 视频落盘（两路）：按各自实测时长拉伸到仿真时间轴 ─────────
         for key, filename in VIDEO_SOURCES.items():
             dst = output / "videos" / f"chunk-{chunk:03d}" / key / f"episode_{ep_idx:06d}.mp4"
-            resample_video(video_dir / filename, dst, M)
+            s_cam = video_dur[key] / t_sim_total      # 视频秒 / 仿真秒
+            start_vid = start_sim * s_cam
+            rem_vid = video_dur[key] - start_vid
+            if rem_vid <= 0:
+                raise RuntimeError(f"{ep_dir.name}: 裁剪后视频时长异常 {key}")
+            resample_video(video_dir / filename, dst, M, start_vid, rem_sim / rem_vid)
 
         # ── 4. Parquet ─────────────────────────────────────────────────
         df = pd.DataFrame({
             "observation.state": [state[i].astype(np.float32) for i in range(M)],
             "action": [action[i].astype(np.float32) for i in range(M)],
-            "timestamp": t_dst.astype(np.float32),
+            "timestamp": timestamp.astype(np.float32),
             "frame_index": np.arange(M, dtype=np.int64),
             "episode_index": np.full(M, ep_idx, dtype=np.int64),
             "index": np.arange(global_index, global_index + M, dtype=np.int64),
@@ -409,10 +562,13 @@ def convert(dataset_root: Path, output: Path, overwrite: bool = False, arm: str 
 
         global_index += M
         total_frames += M
+        trim_note = f"  裁剪自{start_sim:.2f}s" if start_sim > 0 else ""
         print(
             f"  [{ep_idx:03d}] {ep_dir.name}  {M} 帧  "
-            f"(源 {base_frames}f@{base_fps:.2f} / {right_frames}f@{right_fps:.2f})  "
-            f"D={dim}  task={ep['task']}"
+            f"(仿真{rem_sim:.2f}s / 视频 "
+            f"{video_dur['observation.images.base_0_rgb']:.2f}s"
+            f"+{video_dur['observation.images.right_wrist_0_rgb']:.2f}s)  "
+            f"D={dim}  task={ep['task']}{trim_note}"
         )
 
     # ── 6. meta/info.json ──────────────────────────────────────────────
@@ -501,6 +657,29 @@ def main() -> None:
         "--arm", choices=["right", "left", "none"], default="right",
         help="双臂数据里抽哪只手臂（默认 right；已是单臂数据时自动不切）",
     )
+    parser.add_argument(
+        "--trim-takeover", action="store_true",
+        help="DAgger 数据：按 record/dagger.json 的 takeover_row 裁掉模型段，"
+             "只保留 Pico 专家段（无 dagger.json 的集按整段处理）",
+    )
+    parser.add_argument(
+        "--gripper-cmd-hold", type=float, nargs="+", default=None,
+        help="夹持阶段夹爪 action 指令（数据集量纲，按夹爪维度逐个给值，"
+             "如 0.0023 0.0019）；给出后夹爪 action 改用指令而非实测 qpos",
+    )
+    parser.add_argument(
+        "--gripper-cmd-open", type=float, nargs="+", default=None,
+        help="松爪阶段夹爪 action 指令（数据集量纲，如 -0.0207 -0.0207）",
+    )
+    parser.add_argument(
+        "--gripper-cmd-motor-col", type=int, default=1,
+        help="/action/effector/motor 中判定松爪切换的列（双臂默认 1=右夹爪）",
+    )
+    parser.add_argument(
+        "--gripper-action-from-force", action="store_true",
+        help="统一规则：夹爪 action 由电机力+实测位置逐帧反解阻抗指令"
+             "（新旧数据同一口径，推荐）",
+    )
     args = parser.parse_args()
 
     root = Path(args.dataset_root).expanduser().resolve()
@@ -508,7 +687,14 @@ def main() -> None:
     if not root.is_dir():
         sys.exit(f"输入目录不存在: {root}")
 
-    convert(root, out, overwrite=args.overwrite, arm=args.arm)
+    convert(
+        root, out, overwrite=args.overwrite, arm=args.arm,
+        trim_takeover=args.trim_takeover,
+        gripper_cmd_hold=args.gripper_cmd_hold,
+        gripper_cmd_open=args.gripper_cmd_open,
+        gripper_cmd_motor_col=args.gripper_cmd_motor_col,
+        gripper_action_from_force=args.gripper_action_from_force,
+    )
 
 
 if __name__ == "__main__":
