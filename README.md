@@ -66,7 +66,7 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 ├── dataset/
 │   ├── lerobot_g1_pick_v6/    ★ 训练数据集（60 集 / 17105 帧，LeRobot v2.1）
 │   │   ├── data/chunk-000/         episode_000000~000059.parquet
-│   │   ├── videos/chunk-000/       base_0_rgb / right_wrist_0_rgb 两路 mp4
+│   │   ├── videos/chunk-000/       observation.images.base_0_rgb / observation.images.right_wrist_0_rgb 两路 mp4
 │   │   ├── meta/                   info.json / episodes.jsonl / episodes_stats.jsonl / tasks.jsonl
 │   │   └── norm_stats.json         归一化分位数（训练与推理共用）
 │   ├── g1_pick_usda/pi/       原始采集（55 个 episode 目录，HDF5 + 两路 mp4）
@@ -98,7 +98,7 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 |---|---|
 | OrcaStudio / OrcaLab | 任意版本即可，**无需订阅任何资产包**（场景由本仓库自带文件搭建） |
 | OrcaGym | conda 环境 `orcalab_26.9.1` |
-| openpi | 官方 Physical-Intelligence/openpi，打上 `openpi_changes/` 里的文件 |
+| openpi | 官方 Physical-Intelligence/openpi，基线 commit `981483d`（2025-12-27）；打上 `openpi_changes/` 里的 8 个文件 |
 | 训练硬件 | 2× RTX 4090 24GB（无 NVLink） |
 | 推理 | 单卡即可（策略服务约 8.5 GB 显存） |
 
@@ -106,11 +106,19 @@ G1 人形机器人（右臂 6 关节 + DEX1 两指夹爪）在 OrcaStudio 自建
 
 ## 4. 复现顺序
 
-> **脚本路径约定**：`scripts/collection/` 与 `scripts/infer/` 是按 OrcaManipulation 仓库
-> （`OrcaManipulation_g1_pick_tube`）内的相对路径镜像的，运行时需拷回该仓库对应位置
-> （`src/examples/dataCollection/`），并把 `scripts/convert/`、`configs/` 放在任意工作目录即可。
-> 采集与推理都在 conda 环境 `orcalab_26.9.1` 下执行，通过 gRPC 连接 `localhost:50051` 的
-> OrcaGym 服务（OrcaStudio 里先启动场景）。
+> **代码放在哪、在哪运行**
+>
+> - `scripts/collection/` 与 `scripts/infer/` 是从 OrcaManipulation 仓库
+>   （`OrcaManipulation_g1_pick_tube`）的 `src/examples/dataCollection/` 镜像出来的，
+>   必须**拷回该位置**，并且所有采集/推理命令都**在该仓库根目录下执行**：
+>   `python src/examples/dataCollection/<脚本名>.py ...`
+>   （脚本里的 `ENTRY_POINT = envs.dataCollection.dataCollection_env` 要求仓库 `src/` 在
+>   `sys.path` 上，在别处直接跑 `scripts/...` 会 import 失败）
+> - `scripts/convert/`、`configs/` 是独立脚本，放任意目录执行
+> - 采集与推理都在 conda 环境 `orcalab_26.9.1` 下执行，通过 gRPC 连接 `localhost:50051`
+>   的 OrcaGym 服务（先在 OrcaStudio 里启动 level `pi`）
+> - OrcaManipulation 仓库**不随本仓库分发**，需自备；采集/推理依赖它的
+>   `src/envs/dataCollection/data_collection_env.py`（`ENTRY_POINT` 指向这里）
 
 ### 4.1 导入场景（自建 level「pi」）
 
@@ -178,14 +186,19 @@ ls "$PROJ/assets/importer/g1_pick/meshes" | wc -l
 若要重新采集或转换：
 
 ```bash
+# 0) 采集脚本拷回 OrcaManipulation 仓库
+cp -r scripts/collection/* <OrcaManipulation>/src/examples/dataCollection/
+cd <OrcaManipulation>
+
 # 遥操作采集（Pico）：左 Grip 开始/结束一集，右 Grip 丢弃本集
-python scripts/collection/g1_dex1_collection_tele.py --level pi --agent_name g1_pick_usda
+python src/examples/dataCollection/g1_dex1_collection_tele.py --level pi --agent_name g1_pick_usda
 
 # DAgger 纠正采集：模型闭环 → 偏离/停滞时 Pico 接管 → 整段落盘
-python scripts/collection/dagger_release_collect.py \
+python src/examples/dataCollection/dagger_release_collect.py \
   --init-state <失败状态快照.npz> --lerobot-root <数据集根> --level pi
 
-# 转换（DAgger 集必须带 --trim-takeover 和夹爪反解）
+# 转换（回到本仓库根执行；DAgger 集必须带 --trim-takeover 和夹爪反解）
+cd <本仓库>
 python scripts/convert/convert_g1_to_lerobot.py \
   --dataset-root dataset/g1_pick_usda/pi \
   --output ./lerobot_g1_pick_v6 \
@@ -214,16 +227,24 @@ uv run scripts/compute_norm_stats.py --config-name pi05_g1_pick_cube_lora_v6
 >   会从 `train_state/` 恢复 optimizer / 步数 / EMA（先把 v6 的 `1999/` 备份一份）
 
 ```bash
-# 1) 把改动打到 openpi
+# 1) 把 openpi 改动和训练脚本打到 openpi
 cp -r openpi_changes/* $OPENPI_ROOT/
+cp configs/train_g1_pick_cube.sh $OPENPI_ROOT/
 
-# 2) 确认 config.py 里 pi05_g1_pick_cube_lora_v6 的两处绝对路径
-#    - repo_id      → 本仓库 dataset/lerobot_g1_pick_v6
-#    - weight_loader→ v2/1999 params 目录（见 4.4）
+# 2) 改绝对路径，共 5 处
+#    config.py（pi05_g1_pick_cube_lora_v6）
+#      - repo_id       → 本仓库 dataset/lerobot_g1_pick_v6
+#      - weight_loader → v2/1999 params 目录（见 4.4）
+#    train_g1_pick_cube.sh
+#      - OPENPI_DIR / DATASET_DIR / INIT_PARAMS
 
 # 3) 从 v2 的 1999 步继续微调 2000 步
-cd $OPENPI_ROOT && bash configs/train_g1_pick_cube.sh full
+cd $OPENPI_ROOT && bash train_g1_pick_cube.sh full
 ```
+
+训练产物目录 = `$OPENPI_ROOT/checkpoints/<config.name>/<exp_name>/<step>/`，
+脚本里 `EXP_NAME=g1_pick_cube_lora_v6_unified`，所以最终落在
+`checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999/`，与 4.4 的路径一致。
 
 v6 训练配置：
 
@@ -313,28 +334,42 @@ ls $CKPT/params | wc -l && du -sh $CKPT/params
 ### 4.5 推理
 
 ```bash
-# 策略服务（训练机 / 本机 GPU）
+# 策略服务（在 openpi 仓库根，用 openpi 自己的 uv 环境）
+cd $OPENPI_ROOT
 OPENPI_POLICY_SEED=3 CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_PREALLOCATE=false \
-python scripts/serve_policy.py policy:checkpoint \
+uv run scripts/serve_policy.py policy:checkpoint \
   --policy.config pi05_g1_pick_cube_lora_v6 \
   --policy.dir $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999
 
-# 闭环推理（仿真机 / 同一台机器）
-python scripts/infer/infer_g1_pick.py --policy server \
+# 闭环推理（在 OrcaManipulation 仓库根，conda 环境 orcalab_26.9.1）
+cd <OrcaManipulation>
+python src/examples/dataCollection/infer_g1_pick.py --policy server \
   --host 127.0.0.1 --port 8000 --execution-steps 10 --max-steps 600 \
-  --success-hold 30
+  --success-hold 30 --lerobot-root <本仓库>/dataset/lerobot_g1_pick_v6
 ```
+
+`--lerobot-root` 必须指向本仓库的数据集：脚本要从里面读 `norm_stats.json` 和
+`data/chunk-000/episode_000000.parquet`（后者首帧的 9 维 state 用于把机器人摆到初始姿态）。
+脚本内默认值是旧的 `/home/user/pi/lerobot_g1_pick`，不传会直接报找不到文件。
 
 ### 4.6 复现成功率评估
 
-评估就是按第 1 节的协议跑 `infer_g1_pick.py`，每次一个全新进程（保证干净 reset）：
+评估就是按第 1 节的协议跑 `infer_g1_pick.py`，每次一个全新进程：
 
 ```bash
+REPO=<本仓库>
+cd <OrcaManipulation>
 for i in $(seq 1 10); do
-  python scripts/infer/infer_g1_pick.py --policy server --host 127.0.0.1 --port 8000 \
-    --execution-steps 10 --max-steps 600 --success-hold 30 --trace /tmp/run_$i.json
+  python src/examples/dataCollection/infer_g1_pick.py --policy server --host 127.0.0.1 --port 8000 \
+    --execution-steps 10 --max-steps 600 --success-hold 30 \
+    --lerobot-root $REPO/dataset/lerobot_g1_pick_v6 --trace /tmp/run_$i.npz
+  # 本轮结束后在 OrcaStudio 里 reset 场景，让方块/盒子回到 level 初始位置
 done
 ```
+
+**reset 的确切含义**：新进程启动时会 `env.reset()` 并把机器人摆回数据集 episode 0 的首帧姿态
+（[infer_g1_pick.py#L480-L496](scripts/infer/infer_g1_pick.py#L480-L496)）；
+方块和盒子的位置来自 level 初始状态，所以要保证每轮开始前方块在默认位置——脚本不会替你把方块搬回去。
 
 - 成功判据由脚本内的 `success_radius / success_floor_tol / success_speed / success_hold` 实现，
   `--success-hold 30` 即“连续 30 步满足在盒内且静止”
@@ -354,7 +389,10 @@ done
 | 夹爪范围 | action q01 = −0.02072，q99 = +0.00518（全开 −0.0207 / 全闭 +0.0052） |
 | 语言指令 | `Pick up the red cube and place it in the box.` |
 
-`dataset/episode_uuid_mapping.json` 给出每个 episode 对应的原始采集目录与 HDF5 起始行：
+`dataset/episode_uuid_mapping.json` 给出每个 episode 对应的原始采集目录与 HDF5 起始行。
+注意 `uuid` 字段对 ep0–46 的早期集其实是**原始目录名**（纯数字，如 `1`、`11`、`12`），
+只有后期集和 DAgger 集才是真 UUID（如 `fbb84e10-…`）；两种都能在
+`dataset/g1_pick_usda/pi/` 下找到对应目录（55/55 命中）。示例：
 
 ```json
 {"episode_index": 52, "uuid": "fbb84e10-2b45-448e-8a04-49d329578484",

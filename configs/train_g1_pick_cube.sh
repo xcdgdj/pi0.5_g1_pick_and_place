@@ -28,12 +28,12 @@ MODE="${1:-debug}"
 case "$MODE" in
   debug)
     STEPS=100
-    EXP_NAME="g1_pick_cube_v6_debug"
+    EXP_NAME="g1_pick_cube_lora_v6_debug_unified"
     EXTRA_ARGS="--overwrite"
     ;;
   full)
     STEPS=2000
-    EXP_NAME="g1_pick_cube_lora_v6"
+    EXP_NAME="g1_pick_cube_lora_v6_unified"
     EXTRA_ARGS=""
     ;;
   *)
