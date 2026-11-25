@@ -270,19 +270,16 @@ v6 训练配置：
 
 ### 4.4 权重（GitHub Release 分卷下载）
 
-**为什么放 Release**：checkpoint 5.4 GB（`params/` 5.1 GB + `train_state/` 300 MB），
-超过仓库单文件 100 MB 限制。放在本仓库 Release
-[`weights-v6-1999`](https://github.com/xcdgdj/pi0.5_g1_pick_and_place/releases/tag/weights-v6-1999)，
-切成 3 卷（Release 单附件上限 2 GiB）：
+**为什么放 Release**：每个 checkpoint 5.4 GB（`params/` 5.1 GB + `train_state/` 300 MB），
+超过仓库单文件 100 MB 限制。两个 checkpoint 各一个 Release，每个切成 3 卷
+（Release 单附件上限 2 GiB）：
 
-| 文件 | 大小 |
-|---|---|
-| `pi05_g1_pick_cube_lora_v6_1999.tar.00.part` | 2.0 GB |
-| `pi05_g1_pick_cube_lora_v6_1999.tar.01.part` | 2.0 GB |
-| `pi05_g1_pick_cube_lora_v6_1999.tar.02.part` | 1.5 GB |
-| `MD5SUMS.parts` | 3 行 MD5 |
+| Release | 用途 | 卷 | 合并后 MD5 |
+|---|---|---|---|
+| [`weights-v6-1999`](https://github.com/xcdgdj/pi0.5_g1_pick_and_place/releases/tag/weights-v6-1999) | **推理/评估**（本文成绩单） | 2.0 + 2.0 + 1.5 GB | `eef5c8701cc3088cd432ce6b2ab63941` |
+| [`weights-v2-1999`](https://github.com/xcdgdj/pi0.5_g1_pick_and_place/releases/tag/weights-v2-1999) | **重训 v6 的初始化权重** | 2.0 + 2.0 + 1.5 GB | `2a993088493448f4ff52c1b0d6a7b378` |
 
-下载、校验、解压（三步，直接照抄）：
+下载、校验、解压 —— v6（推理用，直接照抄）：
 
 ```bash
 mkdir -p ~/weights && cd ~/weights
@@ -304,14 +301,33 @@ cat pi05_g1_pick_cube_lora_v6_1999.tar.0*.part | tar -xf - \
 
 ```bash
 gh release download weights-v6-1999 -R xcdgdj/pi0.5_g1_pick_and_place -D ~/weights
+gh release download weights-v2-1999 -R xcdgdj/pi0.5_g1_pick_and_place -D ~/weights_v2
 ```
 
-**放到哪 / 还要不要 v2**
+下载、校验、解压 —— v2（只有重训 v6 才需要）：
 
-| 你要做的事 | 需要 | 放到这个目录 |
+```bash
+mkdir -p ~/weights_v2 && cd ~/weights_v2
+BASE=https://github.com/xcdgdj/pi0.5_g1_pick_and_place/releases/download/weights-v2-1999
+for f in pi05_g1_pick_cube_lora_v2_1999.tar.00.part \
+         pi05_g1_pick_cube_lora_v2_1999.tar.01.part \
+         pi05_g1_pick_cube_lora_v2_1999.tar.02.part MD5SUMS.parts; do
+  curl -L -O $BASE/$f
+done
+
+md5sum -c MD5SUMS.parts                                   # 3 行都要 OK
+cat pi05_g1_pick_cube_lora_v2_1999.tar.0*.part | md5sum   # 2a993088493448f4ff52c1b0d6a7b378
+
+cat pi05_g1_pick_cube_lora_v2_1999.tar.0*.part | tar -xf - \
+  -C $OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified
+```
+
+**放到哪**
+
+| 你要做的事 | 需要 | 解压到 |
 |---|---|---|
-| 只跑推理、复现成功率 | 上面的 v6 权重 | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999/` |
-| 还要重新训练 v6 | 再加 v2 的 `1999/`（不在 Release 里，从原训练机拷） | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/` |
+| 只跑推理、复现成功率 | v6 Release | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/` |
+| 还要重新训练 v6 | v2 + v6 两个 Release | v6 同上；v2 解压到 `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/` |
 
 路径那两层目录名（`pi05_..._v6/` 和 `g1_pick_cube_lora_v6_unified/`）必须原样保留，
 openpi 按这个名字找权重，改了就报找不到。
