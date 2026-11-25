@@ -231,21 +231,44 @@ v6 训练配置：
 | 优化器 | AdamW，weight_decay 1e-4，clip 1.0 |
 | 步数 | 2000，每 250 步存 checkpoint |
 
-### 4.4 权重部署
+### 4.4 权重（不在仓库里，要单独拷）
 
-权重超过 GitHub 单文件限制（5.4 GB > 100 MB），单独分发（随附 `MD5SUMS`）。
+**为什么不在仓库**：每个 checkpoint 5.4 GB（`params/` 5.1 GB + `train_state/` 300 MB），
+超过 GitHub 单文件 100 MB 的上限，传不上去。仓库里只有 `checkpoints/README.md` 和
+`checkpoints/norm_stats.json`，权重本体用移动硬盘 / 网盘单独拷。
 
-| 权重 | 用途 | 路径 |
+**拷哪个**
+
+| 你要做的事 | 需要拷 | 放到这个目录 |
 |---|---|---|
-| v2 `1999/` | **v6 训练的初始化权重** | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/` |
-| v6 `1999/` | **推理/评估用**（本文成绩单所用） | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999/` |
+| 只跑推理、复现成功率 | v6 的 `1999/` | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999/` |
+| 还要重新训练 v6 | 再拷 v2 的 `1999/` | `$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v2/g1_pick_cube_lora_v2_unified/1999/` |
 
-```bash
-md5sum -c MD5SUMS     # 全部 OK
+路径那两层目录名（`pi05_..._v6/` 和 `g1_pick_cube_lora_v6_unified/`）必须原样保留，
+openpi 按这个名字找权重，改了就报找不到。
+
+**`1999/` 目录里是什么**
+
+```
+1999/
+├── params/                5.1 GB，6 个条目（orbax 格式，要整个目录拷，不能只挑文件）
+│                          ← 推理必需
+├── train_state/           300 MB，优化器状态，只有"接着训练"才用；只推理可以删
+├── assets/                空，归一化统计用仓库里的 checkpoints/norm_stats.json
+└── _CHECKPOINT_METADATA
 ```
 
-checkpoint 目录里 `params/` 是推理必需（约 5.1 GB），`train_state/` 仅续训需要。
-`assets/` 为空，归一化统计用本仓库 `checkpoints/norm_stats.json`。
+**为什么有两个版本**
+
+- v2/1999：v6 训练的起点（50 集基线训 20000 步的结果），只在重训时用
+- v6/1999：最终权重，本文第 1 节的 80% 成功率就是用它跑出来的
+
+**拷完检查**（应输出 `6`，以及约 `5.1G`）：
+
+```bash
+CKPT=$OPENPI_ROOT/checkpoints/pi05_g1_pick_cube_lora_v6/g1_pick_cube_lora_v6_unified/1999
+ls $CKPT/params | wc -l && du -sh $CKPT/params
+```
 
 ### 4.5 推理
 
